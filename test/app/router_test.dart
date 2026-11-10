@@ -2,17 +2,30 @@ import 'package:al_asad_traders/app/app.dart';
 import 'package:al_asad_traders/app/router.dart';
 import 'package:al_asad_traders/core/strings.dart';
 import 'package:al_asad_traders/features/auth_sync/data/auth_repository.dart';
+import 'package:al_asad_traders/features/auth_sync/providers/device_setup_provider.dart';
 import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+class _FakeSetupNotifier extends DeviceSetupStatusNotifier {
+  _FakeSetupNotifier(this._value);
+  final bool _value;
+
+  @override
+  bool build() => _value;
+}
 
 void main() {
   group('Router and AppShell navigation', () {
     late MockFirebaseAuth mockSignedInAuth;
 
     setUp(() {
+      SharedPreferences.setMockInitialValues(<String, Object>{
+        'device_setup_completed': true,
+      });
       final MockUser mockUser = MockUser(
         uid: 'test-owner-uid',
         email: 'owner@alasad.com',
@@ -33,6 +46,25 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byKey(const Key('login_email_field')), findsOneWidget);
+    });
+
+    testWidgets('redirects to /setup when signed in and setup not completed', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            firebaseAuthProvider.overrideWithValue(mockSignedInAuth),
+            deviceSetupCompletedProvider.overrideWith(
+              () => _FakeSetupNotifier(false),
+            ),
+          ],
+          child: const AlAsadApp(),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Device setup'), findsOneWidget);
     });
 
     testWidgets(
