@@ -10,12 +10,13 @@ Updated: 2026-11-10
 - T-06 First setup & device letter claim (completed 2026-11-10)
 - T-07 Sync state provider & sync chip (completed 2026-11-10)
 - T-08 Logout warning & dialog (completed 2026-11-10)
+- T-09 Profile screen & My business (completed 2026-11-10)
 
 ## Now
-- T-09 Profile screen & My business: ready to start
+- T-10 Buyer and supplier management: ready to start
 
 ## Blocked
 - none
 
 ## Notes for the next chat
-- T-08 completed with logout action (sign out, terminate, clearPersistence) and unsynced data confirmation warning dialog.
+- T-09 completed with Profile model, ProfileRepository, BusinessProfileScreen (`/more/business`), and security rules test for `profile/main`.

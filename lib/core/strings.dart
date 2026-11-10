@@ -206,4 +206,28 @@ abstract final class AppStrings {
 
   /// Continue button label.
   static const String continueLabel = 'Continue';
+
+  // Business profile (S11)
+
+  /// My business menu item and screen title.
+  static const String businessProfileTitle = 'My business';
+
+  /// Business name field label.
+  static const String businessNameLabel = 'Business name';
+
+  /// Business address field label.
+  static const String businessAddressLabel = 'Address';
+
+  /// Contact number 1 field label.
+  static const String contactNumber1Label = 'Contact number 1';
+
+  /// Contact number 2 field label.
+  static const String contactNumber2Label = 'Contact number 2';
+
+  /// Save button label.
+  static const String save = 'Save';
+
+  /// Business profile saved success message.
+  static const String businessProfileSaved =
+      'Business profile saved successfully';
 }

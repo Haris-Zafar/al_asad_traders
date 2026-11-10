@@ -53,4 +53,16 @@ describe('Security Rules - Owner Auth (T-05)', () => {
     await assertFails(nonOwnerDb.collection('deviceRegistry').doc('main').set({ nextIndex: 0 }));
     await assertFails(nonOwnerDb.collection('devices').doc('A').set({ lastNumber: 0 }));
   });
+
+  it('allows owner to read and write profile main document (T-09)', async () => {
+    const ownerDb = testEnv.authenticatedContext('OWNER_UID').firestore();
+    await assertSucceeds(ownerDb.collection('profile').doc('main').set({ businessName: 'Test' }));
+    await assertSucceeds(ownerDb.collection('profile').doc('main').get());
+  });
+
+  it('denies non-owner to read and write profile main document (T-09)', async () => {
+    const nonOwnerDb = testEnv.authenticatedContext('other-uid').firestore();
+    await assertFails(nonOwnerDb.collection('profile').doc('main').set({ businessName: 'Test' }));
+    await assertFails(nonOwnerDb.collection('profile').doc('main').get());
+  });
 });
