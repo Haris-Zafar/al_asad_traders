@@ -155,6 +155,20 @@ abstract final class AppStrings {
   /// Concurrent edit or conflict error message.
   static const String errorConflict = 'This item has changed. Please refresh.';
 
+  // Navigation tabs
+
+  /// Bills bottom navigation tab label.
+  static const String billsTab = 'Bills';
+
+  /// Demands bottom navigation tab label.
+  static const String demandsTab = 'Demands';
+
+  /// Buyers bottom navigation tab label.
+  static const String buyersTab = 'Buyers';
+
+  /// More bottom navigation tab label.
+  static const String moreTab = 'More';
+
   // Accessibility labels
 
   /// Back navigation affordance.
