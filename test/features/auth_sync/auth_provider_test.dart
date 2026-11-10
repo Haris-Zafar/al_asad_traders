@@ -1,7 +1,6 @@
 import 'package:al_asad_traders/core/errors/app_exception.dart';
 import 'package:al_asad_traders/features/auth_sync/data/auth_repository.dart';
 import 'package:al_asad_traders/features/auth_sync/providers/auth_provider.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -27,7 +26,7 @@ void main() {
         addTearDown(container.dispose);
 
         // Keep subscription active
-        container.listen(authStateProvider, (_, __) {});
+        container.listen(authStateProvider, (previous, next) {});
 
         expect(container.read(authStateProvider).value, isNull);
 
