@@ -26,7 +26,7 @@ void main() {
         addTearDown(container.dispose);
 
         // Keep subscription active
-        container.listen(authStateProvider, (_, _) {});
+        container.listen(authStateProvider, (previous, next) {});
 
         expect(container.read(authStateProvider).value, isNull);
 
