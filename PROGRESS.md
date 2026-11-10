@@ -8,12 +8,13 @@ Updated: 2026-11-10
 - T-04 Router, app shell & tab navigation (completed 2026-11-10)
 - T-05 Authentication & login screen (completed 2026-11-10)
 - T-06 First setup & device letter claim (completed 2026-11-10)
+- T-07 Sync state provider & sync chip (completed 2026-11-10)
 
 ## Now
-- T-07 Sync state provider & sync chip: in progress, feature/T-06-device-setup
+- T-08 Logout warning & dialog: ready to start
 
 ## Blocked
 - none
 
 ## Notes for the next chat
-- T-06 is completed. T-07 is ready to start.
+- T-07 completed with SyncTracker, syncStateProvider, unit tests, and SyncChip integration.

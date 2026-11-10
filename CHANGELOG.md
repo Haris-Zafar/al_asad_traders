@@ -3,6 +3,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+- Sync state tracking provider and real-time sync status UI chip.
+- First login device setup transaction and invoice letter claiming.
 - Email and password login screen with persistent authentication and owner security rules.
 - App navigation shell with four bottom navigation tabs (Bills, Demands, Buyers, More) and backstack handling.
 - Core shared UI widgets, dialogs, sheets, and test environment harness.
