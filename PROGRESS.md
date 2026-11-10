@@ -8,12 +8,14 @@ Updated: 2026-11-10
 - T-04 Router, app shell & tab navigation (completed 2026-11-10)
 - T-05 Authentication & login screen (completed 2026-11-10)
 - T-06 First setup & device letter claim (completed 2026-11-10)
+- T-07 Sync state provider & sync chip (completed 2026-11-10)
 
 ## Now
-- T-07 Sync state provider & sync chip: ready to start
+- T-08 Logout warning & dialog: ready to start
 
 ## Blocked
 - none
 
 ## Notes for the next chat
-- First login executes device letter claim transaction on deviceRegistry/main, creates device doc, and performs initial full sync.
+- T-06 completed with device letter claim and setup screen.
+- T-07 completed with SyncTracker, syncStateProvider, unit tests, and SyncChip integration.

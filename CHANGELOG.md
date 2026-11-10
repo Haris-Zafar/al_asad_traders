@@ -3,6 +3,7 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+- Sync state tracking provider and real-time sync status UI chip.
 - First-time device setup flow with atomic letter claim transaction (`deviceRegistry/main`), spreadsheet index-to-letter calculation, and initial full server sync.
 - Email and password login screen with persistent authentication and owner security rules.
 - App navigation shell with four bottom navigation tabs (Bills, Demands, Buyers, More) and backstack handling.
