@@ -1,16 +1,7 @@
+import 'package:al_asad_traders/app/app.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() {
-  runApp(const MyApp());
-}
-
-/// Root widget of the application.
-class MyApp extends StatelessWidget {
-  /// Creates the root application widget.
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(home: Scaffold(body: SizedBox.expand()));
-  }
+  runApp(const ProviderScope(child: AlAsadApp()));
 }
