@@ -1,0 +1,12 @@
+{
+  "name": "al-asad-traders-rules-test",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "mocha test.js --exit"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^3.0.3",
+    "mocha": "^10.7.3"
+  }
+}
