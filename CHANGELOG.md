@@ -3,6 +3,7 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+- Business profile management screen (`/more/business`) and repository for updating business name, address, and contact numbers.
 - Logout warning dialog when unsynced data exists and persistence cache clearance on logout.
 - Sync state tracking provider and real-time sync status UI chip.
 - First-time device setup flow with atomic letter claim transaction (`deviceRegistry/main`), spreadsheet index-to-letter calculation, and initial full server sync.

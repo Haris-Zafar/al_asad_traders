@@ -1,10 +1,11 @@
 import 'package:al_asad_traders/app/app_shell.dart';
 import 'package:al_asad_traders/core/strings.dart';
-import 'package:al_asad_traders/core/widgets/app_scaffold.dart';
+import 'package:al_asad_traders/core/widgets/widgets.dart';
 import 'package:al_asad_traders/features/auth_sync/providers/auth_provider.dart';
 import 'package:al_asad_traders/features/auth_sync/providers/device_setup_provider.dart';
 import 'package:al_asad_traders/features/auth_sync/ui/login_screen.dart';
 import 'package:al_asad_traders/features/auth_sync/ui/setup_screen.dart';
+import 'package:al_asad_traders/features/people/ui/business_profile_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -121,6 +122,14 @@ GoRouter createRouter({
                 builder: (BuildContext context, GoRouterState state) {
                   return const MoreTabScreen();
                 },
+                routes: <RouteBase>[
+                  GoRoute(
+                    path: 'business',
+                    builder: (BuildContext context, GoRouterState state) {
+                      return const BusinessProfileScreen();
+                    },
+                  ),
+                ],
               ),
             ],
           ),
@@ -215,16 +224,29 @@ class BuyersTabScreen extends StatelessWidget {
   }
 }
 
-/// Placeholder screen for the More tab.
+/// Screen for the More tab.
+/// Rule: docs/UI_PLAN.md > Screens (/more). Story: S11.
 class MoreTabScreen extends StatelessWidget {
   /// Creates a [MoreTabScreen].
   const MoreTabScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const AppScaffold(
+    return AppScaffold(
       title: AppStrings.moreTab,
-      body: KeyedSubtree(key: Key('more_tab_screen'), child: SizedBox.shrink()),
+      body: KeyedSubtree(
+        key: const Key('more_tab_screen'),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            AppListRow(
+              key: const Key('more_business_row'),
+              title: AppStrings.businessProfileTitle,
+              onTap: () => context.go('/more/business'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
