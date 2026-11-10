@@ -191,4 +191,19 @@ abstract final class AppStrings {
 
   /// Increase quantity stepper button.
   static const String increase = 'Increase';
+
+  // Setup screen (S33)
+
+  /// Device setup title.
+  static const String setupTitle = 'Device setup';
+
+  /// Device setup progress message.
+  static const String setupMessage =
+      'Setting up your device and downloading business data. Please wait...';
+
+  /// Device setup connecting status.
+  static const String setupConnecting = 'Connecting and syncing...';
+
+  /// Continue button label.
+  static const String continueLabel = 'Continue';
 }

@@ -17,4 +17,5 @@ Updated: 2026-11-10
 - none
 
 ## Notes for the next chat
+- T-06 completed with device letter claim and setup screen.
 - T-07 completed with SyncTracker, syncStateProvider, unit tests, and SyncChip integration.
