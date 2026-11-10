@@ -1,10 +1,12 @@
 import 'package:al_asad_traders/features/auth_sync/data/auth_repository.dart';
+import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('AuthRepository', () {
     late MockFirebaseAuth mockAuth;
+    late FakeFirebaseFirestore fakeFirestore;
     late AuthRepository repository;
 
     setUp(() {
@@ -13,7 +15,8 @@ void main() {
         email: 'owner@alasad.com',
       );
       mockAuth = MockFirebaseAuth(mockUser: mockUser, signedIn: false);
-      repository = AuthRepository(mockAuth);
+      fakeFirestore = FakeFirebaseFirestore();
+      repository = AuthRepository(mockAuth, firestore: fakeFirestore);
     });
 
     test('authStateChanges emits current user state', () async {
