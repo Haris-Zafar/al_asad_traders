@@ -1,4 +1,5 @@
 import 'package:al_asad_traders/core/theme/text_scale.dart';
+import 'package:al_asad_traders/features/auth_sync/data/auth_repository.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -65,7 +66,7 @@ class TestEnv {
     final FakeScanner scanner = FakeScanner();
 
     final ProviderContainer container = ProviderContainer(
-      overrides: overrides.cast(),
+      overrides: [firebaseAuthProvider.overrideWithValue(auth), ...overrides],
     );
 
     return TestEnv._(

@@ -17,6 +17,7 @@ class AppTextField extends StatelessWidget {
     this.inputFormatters,
     this.readOnly = false,
     this.autofocus = false,
+    this.obscureText = false,
     this.prefixIcon,
     this.suffixIcon,
     this.maxLines = 1,
@@ -53,6 +54,9 @@ class AppTextField extends StatelessWidget {
   /// Whether this field requests focus on appearance.
   final bool autofocus;
 
+  /// Whether password obscuring is enabled.
+  final bool obscureText;
+
   /// Optional leading widget inside the field boundary.
   final Widget? prefixIcon;
 
@@ -72,6 +76,7 @@ class AppTextField extends StatelessWidget {
       focusNode: focusNode,
       autofocus: autofocus,
       readOnly: readOnly,
+      obscureText: obscureText,
       maxLines: maxLines,
       keyboardType: keyboardType,
       inputFormatters: inputFormatters,

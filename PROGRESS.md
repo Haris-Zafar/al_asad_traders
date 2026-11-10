@@ -6,12 +6,13 @@ Updated: 2026-11-10
 - T-02 Theme, sizing, strings, errors & format (completed 2026-11-10)
 - T-03 Shared widgets & TestEnv helpers (completed 2026-11-10)
 - T-04 Router, app shell & tab navigation (completed 2026-11-10)
+- T-05 Authentication & login screen (completed 2026-11-10)
 
 ## Now
-- T-05 Authentication & login screen: ready to start
+- T-06 First setup & device letter claim: ready to start
 
 ## Blocked
 - none
 
 ## Notes for the next chat
-- GoRouter stateful shell router configured in lib/app/ with 4 bottom navigation tabs.
+- Firebase Auth persistent login and login screen configured with router redirect.

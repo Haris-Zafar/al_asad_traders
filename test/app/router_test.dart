@@ -1,6 +1,8 @@
 import 'package:al_asad_traders/app/app.dart';
 import 'package:al_asad_traders/app/router.dart';
 import 'package:al_asad_traders/core/strings.dart';
+import 'package:al_asad_traders/features/auth_sync/data/auth_repository.dart';
+import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -8,23 +10,63 @@ import 'package:go_router/go_router.dart';
 
 void main() {
   group('Router and AppShell navigation', () {
-    testWidgets('launches into 4-tab shell with Bills as initial tab', (
+    late MockFirebaseAuth mockSignedInAuth;
+
+    setUp(() {
+      final MockUser mockUser = MockUser(
+        uid: 'test-owner-uid',
+        email: 'owner@alasad.com',
+      );
+      mockSignedInAuth = MockFirebaseAuth(mockUser: mockUser, signedIn: true);
+    });
+
+    testWidgets('redirects to /login when unauthenticated', (
       WidgetTester tester,
     ) async {
-      await tester.pumpWidget(const ProviderScope(child: AlAsadApp()));
+      final MockFirebaseAuth signedOutAuth = MockFirebaseAuth(signedIn: false);
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [firebaseAuthProvider.overrideWithValue(signedOutAuth)],
+          child: const AlAsadApp(),
+        ),
+      );
       await tester.pumpAndSettle();
 
-      expect(find.byKey(const Key('bills_tab_screen')), findsOneWidget);
-      expect(find.text(AppStrings.billsTab), findsWidgets);
-      expect(find.text(AppStrings.demandsTab), findsWidgets);
-      expect(find.text(AppStrings.buyersTab), findsWidgets);
-      expect(find.text(AppStrings.moreTab), findsWidgets);
+      expect(find.byKey(const Key('login_email_field')), findsOneWidget);
     });
+
+    testWidgets(
+      'launches into 4-tab shell with Bills as initial tab when signed in',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              firebaseAuthProvider.overrideWithValue(mockSignedInAuth),
+            ],
+            child: const AlAsadApp(),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.byKey(const Key('bills_tab_screen')), findsOneWidget);
+        expect(find.text(AppStrings.billsTab), findsWidgets);
+        expect(find.text(AppStrings.demandsTab), findsWidgets);
+        expect(find.text(AppStrings.buyersTab), findsWidgets);
+        expect(find.text(AppStrings.moreTab), findsWidgets);
+      },
+    );
 
     testWidgets(
       'switches tabs when bottom navigation destinations are tapped',
       (WidgetTester tester) async {
-        await tester.pumpWidget(const ProviderScope(child: AlAsadApp()));
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              firebaseAuthProvider.overrideWithValue(mockSignedInAuth),
+            ],
+            child: const AlAsadApp(),
+          ),
+        );
         await tester.pumpAndSettle();
 
         // Tap Demands tab
@@ -57,6 +99,7 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
+            firebaseAuthProvider.overrideWithValue(mockSignedInAuth),
             routerProvider.overrideWith((ref) {
               router = createRouter();
               return router;
@@ -90,7 +133,14 @@ void main() {
     testWidgets(
       'Android back button on non-Bills tab root returns to Bills tab',
       (WidgetTester tester) async {
-        await tester.pumpWidget(const ProviderScope(child: AlAsadApp()));
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              firebaseAuthProvider.overrideWithValue(mockSignedInAuth),
+            ],
+            child: const AlAsadApp(),
+          ),
+        );
         await tester.pumpAndSettle();
 
         // Go to Demands tab root
@@ -115,6 +165,7 @@ void main() {
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
+              firebaseAuthProvider.overrideWithValue(mockSignedInAuth),
               routerProvider.overrideWith((ref) {
                 router = createRouter();
                 return router;
@@ -147,7 +198,12 @@ void main() {
     testWidgets('Android back button on Bills tab root allows pop / exit', (
       WidgetTester tester,
     ) async {
-      await tester.pumpWidget(const ProviderScope(child: AlAsadApp()));
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [firebaseAuthProvider.overrideWithValue(mockSignedInAuth)],
+          child: const AlAsadApp(),
+        ),
+      );
       await tester.pumpAndSettle();
 
       expect(find.byKey(const Key('bills_tab_screen')), findsOneWidget);

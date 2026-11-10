@@ -1,7 +1,9 @@
 import 'package:al_asad_traders/app/app_shell.dart';
 import 'package:al_asad_traders/core/strings.dart';
 import 'package:al_asad_traders/core/widgets/app_scaffold.dart';
-
+import 'package:al_asad_traders/features/auth_sync/providers/auth_provider.dart';
+import 'package:al_asad_traders/features/auth_sync/ui/login_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -9,15 +11,39 @@ import 'package:go_router/go_router.dart';
 /// Provider for the application [GoRouter].
 /// Rule: docs/ARCHITECTURE.md > Folders. Story: none.
 final Provider<GoRouter> routerProvider = Provider<GoRouter>((ref) {
-  return createRouter();
+  final AsyncValue<User?> authAsync = ref.watch(authStateProvider);
+  final bool isLoggedIn = authAsync.value != null;
+
+  return createRouter(
+    redirect: (BuildContext context, GoRouterState state) {
+      final bool isLoggingIn = state.matchedLocation == '/login';
+      if (!isLoggedIn && !isLoggingIn) {
+        return '/login';
+      }
+      if (isLoggedIn && isLoggingIn) {
+        return '/bills';
+      }
+      return null;
+    },
+  );
 });
 
 /// Creates the application [GoRouter] instance.
 /// Rule: docs/UI_PLAN.md > Navigation. Story: none.
-GoRouter createRouter({String initialLocation = '/bills'}) {
+GoRouter createRouter({
+  String initialLocation = '/bills',
+  String? Function(BuildContext, GoRouterState)? redirect,
+}) {
   return GoRouter(
     initialLocation: initialLocation,
+    redirect: redirect,
     routes: <RouteBase>[
+      GoRoute(
+        path: '/login',
+        builder: (BuildContext context, GoRouterState state) {
+          return const LoginScreen();
+        },
+      ),
       StatefulShellRoute.indexedStack(
         builder:
             (

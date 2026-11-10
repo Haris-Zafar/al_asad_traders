@@ -122,6 +122,15 @@ abstract final class AppStrings {
   /// Negative or postpone choice in confirmation dialogs.
   static const String notYet = 'Not yet';
 
+  /// User login action.
+  static const String logIn = 'Log in';
+
+  /// Email field label.
+  static const String email = 'Email';
+
+  /// Password field label.
+  static const String password = 'Password';
+
   /// User logout action.
   static const String logOut = 'Log out';
 
@@ -148,6 +157,9 @@ abstract final class AppStrings {
 
   /// Input validation error prompt.
   static const String errorValidation = 'Please check the entered details.';
+
+  /// Invalid email or password error prompt.
+  static const String errorInvalidCredentials = 'Invalid email or password';
 
   /// Resource not found error message.
   static const String errorNotFound = 'The requested item was not found.';
