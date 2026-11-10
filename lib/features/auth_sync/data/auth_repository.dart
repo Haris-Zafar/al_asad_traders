@@ -1,5 +1,6 @@
 import 'package:al_asad_traders/core/errors/app_exception.dart';
 import 'package:al_asad_traders/core/strings.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -21,10 +22,14 @@ final Provider<AuthRepository> authRepositoryProvider =
 /// Repository handling persistent owner authentication operations.
 /// Rule: docs/ARCHITECTURE.md > Layers. Story: S32.
 class AuthRepository {
-  /// Creates an [AuthRepository] with the given [FirebaseAuth] instance.
-  AuthRepository(this._auth);
+  /// Creates an [AuthRepository] with the given [FirebaseAuth] and optional [FirebaseFirestore] instances.
+  AuthRepository(this._auth, {this._firestore});
 
   final FirebaseAuth _auth;
+  final FirebaseFirestore? _firestore;
+
+  FirebaseFirestore get _resolvedFirestore =>
+      _firestore ?? FirebaseFirestore.instance;
 
   /// Stream emitting changes to the current authenticated user state.
   /// Rule: docs/ARCHITECTURE.md > Repository. Story: S32.
@@ -58,11 +63,17 @@ class AuthRepository {
     }
   }
 
-  /// Signs out the current user.
+  /// Signs out the current user, terminates Firestore, and clears persistence cache.
   /// Rule: wholesale_project.md > Login, device and sync. Story: S35.
   Future<void> signOut() async {
     try {
       await _auth.signOut();
+      try {
+        await _resolvedFirestore.terminate();
+      } catch (_) {}
+      try {
+        await _resolvedFirestore.clearPersistence();
+      } catch (_) {}
     } on FirebaseAuthException catch (e) {
       throw _mapFirebaseAuthException(e);
     } catch (e) {
