@@ -9,13 +9,13 @@ Updated: 2026-11-10
 - T-05 Authentication & login screen (completed 2026-11-10)
 - T-06 First setup & device letter claim (completed 2026-11-10)
 - T-07 Sync state provider & sync chip (completed 2026-11-10)
+- T-08 Logout warning & dialog (completed 2026-11-10)
 
 ## Now
-- T-08 Logout warning & dialog: ready to start
+- T-09 Profile screen & My business: ready to start
 
 ## Blocked
 - none
 
 ## Notes for the next chat
-- T-06 completed with device letter claim and setup screen.
-- T-07 completed with SyncTracker, syncStateProvider, unit tests, and SyncChip integration.
+- T-08 completed with logout action (sign out, terminate, clearPersistence) and unsynced data confirmation warning dialog.

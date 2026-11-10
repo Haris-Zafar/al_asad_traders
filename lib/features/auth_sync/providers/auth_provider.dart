@@ -52,3 +52,27 @@ final NotifierProvider<LoginNotifier, AsyncValue<void>>
 loginControllerProvider = NotifierProvider<LoginNotifier, AsyncValue<void>>(
   LoginNotifier.new,
 );
+
+/// Controller for performing owner logout operations.
+/// Rule: docs/ARCHITECTURE.md > State pattern. Story: S35.
+class LogoutNotifier extends Notifier<AsyncValue<void>> {
+  @override
+  AsyncValue<void> build() => const AsyncValue.data(null);
+
+  /// Signs out the owner, clears persistence, and resets auth state.
+  /// Rule: wholesale_project.md > Login, device and sync. Story: S35.
+  Future<void> logout() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final AuthRepository repo = ref.read(authRepositoryProvider);
+      await repo.signOut();
+    });
+  }
+}
+
+/// Provider for [LogoutNotifier].
+/// Rule: docs/ARCHITECTURE.md > State pattern. Story: S35.
+final NotifierProvider<LogoutNotifier, AsyncValue<void>>
+logoutControllerProvider = NotifierProvider<LogoutNotifier, AsyncValue<void>>(
+  LogoutNotifier.new,
+);
