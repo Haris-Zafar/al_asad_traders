@@ -7,12 +7,13 @@ Updated: 2026-11-10
 - T-03 Shared widgets & TestEnv helpers (completed 2026-11-10)
 - T-04 Router, app shell & tab navigation (completed 2026-11-10)
 - T-05 Authentication & login screen (completed 2026-11-10)
+- T-06 First setup & device letter claim (completed 2026-11-10)
 
 ## Now
-- T-06 First setup & device letter claim: ready to start
+- T-07 Sync state provider & sync chip: in progress, feature/T-06-device-setup
 
 ## Blocked
 - none
 
 ## Notes for the next chat
-- Firebase Auth persistent login and login screen configured with router redirect.
+- T-06 is completed. T-07 is ready to start.
