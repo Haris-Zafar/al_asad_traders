@@ -1,14 +1,14 @@
 # Progress
-Updated: 2026-11-07
+Updated: 2026-11-08
 
 ## Done
-- none
+- T-01 Project setup, CI & rules-test scaffold (completed 2026-11-08)
 
 ## Now
-- T-01 Project setup, CI & rules-test scaffold: not started
+- T-02 Theme, sizing, strings, errors & format: ready to start
 
 ## Blocked
 - none
 
 ## Notes for the next chat
-- Plan approved on 2026-11-07. Ready to start T-01.
+- T-01 setup complete. CI workflow configured and firestore rules-test scaffold working.
