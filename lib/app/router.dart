@@ -2,7 +2,9 @@ import 'package:al_asad_traders/app/app_shell.dart';
 import 'package:al_asad_traders/core/strings.dart';
 import 'package:al_asad_traders/core/widgets/app_scaffold.dart';
 import 'package:al_asad_traders/features/auth_sync/providers/auth_provider.dart';
+import 'package:al_asad_traders/features/auth_sync/providers/device_setup_provider.dart';
 import 'package:al_asad_traders/features/auth_sync/ui/login_screen.dart';
+import 'package:al_asad_traders/features/auth_sync/ui/setup_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,14 +15,20 @@ import 'package:go_router/go_router.dart';
 final Provider<GoRouter> routerProvider = Provider<GoRouter>((ref) {
   final AsyncValue<User?> authAsync = ref.watch(authStateProvider);
   final bool isLoggedIn = authAsync.value != null;
+  final bool isSetupCompleted = ref.watch(deviceSetupCompletedProvider);
 
   return createRouter(
     redirect: (BuildContext context, GoRouterState state) {
       final bool isLoggingIn = state.matchedLocation == '/login';
+      final bool isSetup = state.matchedLocation == '/setup';
+
       if (!isLoggedIn && !isLoggingIn) {
         return '/login';
       }
-      if (isLoggedIn && isLoggingIn) {
+      if (isLoggedIn && !isSetupCompleted && !isSetup) {
+        return '/setup';
+      }
+      if (isLoggedIn && isSetupCompleted && (isLoggingIn || isSetup)) {
         return '/bills';
       }
       return null;
@@ -42,6 +50,12 @@ GoRouter createRouter({
         path: '/login',
         builder: (BuildContext context, GoRouterState state) {
           return const LoginScreen();
+        },
+      ),
+      GoRoute(
+        path: '/setup',
+        builder: (BuildContext context, GoRouterState state) {
+          return const SetupScreen();
         },
       ),
       StatefulShellRoute.indexedStack(

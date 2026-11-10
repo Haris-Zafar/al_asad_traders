@@ -41,4 +41,16 @@ describe('Security Rules - Owner Auth (T-05)', () => {
     await assertSucceeds(ownerDb.collection('bills').get());
     await assertSucceeds(ownerDb.collection('bills').doc('bill-1').set({ status: 'draft' }));
   });
+
+  it('allows owner to read and write deviceRegistry and devices (T-06)', async () => {
+    const ownerDb = testEnv.authenticatedContext('OWNER_UID').firestore();
+    await assertSucceeds(ownerDb.collection('deviceRegistry').doc('main').set({ nextIndex: 0 }));
+    await assertSucceeds(ownerDb.collection('devices').doc('A').set({ lastNumber: 0 }));
+  });
+
+  it('denies non-owner to write deviceRegistry and devices (T-06)', async () => {
+    const nonOwnerDb = testEnv.authenticatedContext('other-uid').firestore();
+    await assertFails(nonOwnerDb.collection('deviceRegistry').doc('main').set({ nextIndex: 0 }));
+    await assertFails(nonOwnerDb.collection('devices').doc('A').set({ lastNumber: 0 }));
+  });
 });
