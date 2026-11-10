@@ -1,0 +1,207 @@
+%% Firestore: one collection per entity. IDs are strings. date = "yyyy-MM-dd" string. datetime = Timestamp.
+erDiagram
+    PRODUCT ||--o{ PRODUCT_TAG : "tagged with"
+    TAG ||--o{ PRODUCT_TAG : "applied to"
+    PRODUCT ||--o| PRODUCT_SKU : "reserves barcode"
+
+    PRODUCT ||--o{ SUPPLIER_RATE : "purchased at"
+    SUPPLIER ||--o{ SUPPLIER_RATE : "quotes"
+    PRODUCT ||--o{ BUYER_RATE : "sold at"
+    BUYER ||--o{ BUYER_RATE : "buys at"
+    PRODUCT ||--o{ RETAIL_PRICE : "priced at"
+
+    BUYER ||--o{ DEMAND : "raises"
+    DEMAND ||--o{ DEMAND_ITEM : "contains"
+    PRODUCT ||--o{ DEMAND_ITEM : "demanded as"
+
+    SUPPLIER ||--o{ SUMMARY : "purchase list from"
+    SUMMARY ||--o{ SUMMARY_ITEM : "contains"
+    PRODUCT ||--o{ SUMMARY_ITEM : "listed as"
+    SUMMARY_ITEM |o--o{ DEMAND_ITEM : "shared by"
+
+    BUYER ||--o{ BILL : "billed to"
+    BILL ||--o{ BILL_ITEM : "contains"
+    PRODUCT ||--o{ BILL_ITEM : "sold as"
+    DEMAND_ITEM |o--o{ BILL_ITEM : "billed as"
+
+    BUYER ||--o{ LEDGER_ENTRY : "ledger entries"
+    BILL |o--o| LEDGER_ENTRY : "moved to ledger as"
+
+    PROFILE |o--o{ BANK_ACCOUNT : "owns"
+    BUYER |o--o{ BANK_ACCOUNT : "owns"
+    SUPPLIER |o--o{ BANK_ACCOUNT : "owns"
+    BANK_ACCOUNT |o--o{ LEDGER_ENTRY : "received money in"
+
+    PRODUCT {
+        string id PK
+        string name
+        string sku UK "optional barcode"
+        int defaultSupplierRate
+        int defaultBuyerRate
+        int defaultRetailPrice
+        string notes
+        datetime archivedAt "empty = active"
+        datetime createdAt
+    }
+
+    PRODUCT_SKU {
+        string sku PK "id is the barcode, create and delete only"
+        string productId FK
+    }
+
+    TAG {
+        string id PK "lowercase name"
+        string name UK
+        datetime createdAt
+    }
+
+    PRODUCT_TAG {
+        string productId PK, FK "id is productId_tagId"
+        string tagId PK, FK
+    }
+
+    SUPPLIER {
+        string id PK
+        string name
+        string contactNumber
+        string address
+        string notes
+        datetime archivedAt
+        datetime createdAt
+    }
+
+    BUYER {
+        string id PK
+        string name
+        string contactNumber
+        string address
+        string notes
+        datetime archivedAt
+        datetime createdAt
+    }
+
+    PROFILE {
+        string id PK "always main, single document"
+        string businessName
+        string businessAddress
+        string contactNumber1
+        string contactNumber2
+    }
+
+    BANK_ACCOUNT {
+        string id PK
+        string profileId FK "exactly one owner FK is set"
+        string buyerId FK
+        string supplierId FK
+        string name
+        string accountNumber
+        string notes
+        datetime archivedAt
+        datetime createdAt
+    }
+
+    SUPPLIER_RATE {
+        string id PK "supplierId_productId_effectiveDate"
+        string supplierId FK
+        string productId FK
+        int rate
+        date effectiveDate
+        datetime createdAt
+    }
+
+    BUYER_RATE {
+        string id PK "buyerId_productId_effectiveDate"
+        string buyerId FK
+        string productId FK
+        int rate
+        date effectiveDate
+        datetime createdAt
+    }
+
+    RETAIL_PRICE {
+        string id PK "productId_effectiveDate"
+        string productId FK
+        int price
+        date effectiveDate
+        datetime createdAt
+    }
+
+    DEMAND {
+        string id PK
+        string buyerId FK
+        date demandDate
+        datetime createdAt
+    }
+
+    DEMAND_ITEM {
+        string id PK
+        string demandId FK
+        string summaryItemId FK "empty until sent to a purchase list"
+        string productId FK
+        int quantity
+        int billedQuantity "denormalised: sum of its bill item quantities"
+        datetime createdAt
+    }
+
+    SUMMARY {
+        string id PK
+        string supplierId FK
+        date summaryDate
+        string status "open or purchased"
+        datetime createdAt
+    }
+
+    SUMMARY_ITEM {
+        string id PK "summaryId_productId"
+        string summaryId FK
+        string productId FK
+        int quantity
+        int purchaseRate "empty until recorded"
+        string notes
+        datetime createdAt
+    }
+
+    BILL {
+        string id PK "generated, exists from draft"
+        string buyerId FK
+        string invoiceNumber UK "INV-A-0001, empty until issued"
+        date billDate
+        string status "draft, issued, cleared, ledger"
+        int grandTotal "empty until issued"
+        datetime issuedAt
+        string notes
+        datetime createdAt
+    }
+
+    BILL_ITEM {
+        string id PK
+        string billId FK
+        string demandItemId FK "empty if added directly"
+        string productId FK
+        int quantity
+        int pricePerUnit
+        datetime createdAt
+    }
+
+    LEDGER_ENTRY {
+        string id PK "bill_ + billId on bill entries"
+        string buyerId FK "the buyer whose ledger this is"
+        string billId FK, UK "only on bill entries"
+        string bankAccountId FK "only on bank_transfer, own account"
+        string entryType
+        int amount "never 0"
+        date entryDate
+        string notes
+        datetime createdAt
+    }
+
+    DEVICE {
+        string id PK "letter: A..Z, AA, AB..."
+        int lastNumber "last invoice number issued, 0 at start"
+        datetime createdAt
+    }
+
+    DEVICE_REGISTRY {
+        string id PK "always main, single document"
+        int nextIndex "0 = A, 25 = Z, 26 = AA"
+    }
