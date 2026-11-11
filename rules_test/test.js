@@ -192,4 +192,43 @@ describe('Security Rules - Owner Auth (T-05)', () => {
       }),
     );
   });
+
+  it('allows owner to write valid product document and denies invalid/delete (T-12)', async () => {
+    const ownerDb = testEnv.authenticatedContext('po2rFc75KISIx5DuyyiQhznl3nM2').firestore();
+    const validProduct = {
+      name: 'Sugar 1kg',
+      sku: '1234567890123',
+      defaultSupplierRate: 140,
+      defaultBuyerRate: 150,
+      defaultRetailPrice: 160,
+      notes: 'Good quality',
+      archivedAt: null,
+      createdAt: new Date(),
+    };
+    await assertSucceeds(ownerDb.collection('products').doc('p1').set(validProduct));
+    // Invalid: negative price
+    const invalidProduct = {
+      ...validProduct,
+      defaultSupplierRate: -10,
+    };
+    await assertFails(ownerDb.collection('products').doc('p2').set(invalidProduct));
+    await assertFails(ownerDb.collection('products').doc('p1').delete());
+  });
+
+  it('denies non-owner to read or write products (T-12)', async () => {
+    const nonOwnerDb = testEnv.authenticatedContext('other-uid').firestore();
+    await assertFails(nonOwnerDb.collection('products').get());
+    await assertFails(
+      nonOwnerDb.collection('products').doc('p1').set({
+        name: 'Sugar 1kg',
+        sku: null,
+        defaultSupplierRate: 140,
+        defaultBuyerRate: 150,
+        defaultRetailPrice: 160,
+        notes: null,
+        archivedAt: null,
+        createdAt: new Date(),
+      }),
+    );
+  });
 });

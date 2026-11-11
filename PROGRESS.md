@@ -13,12 +13,13 @@ Updated: 2026-11-10
 - T-09 Profile screen & My business (completed 2026-11-10)
 - T-10 Buyer and supplier management (completed 2026-11-10)
 - T-11 Bank accounts (own, buyers, suppliers) (completed 2026-11-10)
+- T-12 Add and list products (completed 2026-11-10)
 
 ## Now
-- T-12 Add and list products: ready to start
+- T-13 Product barcode scanning & lookup: ready to start
 
 ## Blocked
 - none
 
 ## Notes for the next chat
-- T-11 completed with BankAccount model, repository, providers, management sheet UI, and single-owner Firestore security rules enforcement.
+- T-12 completed with Product model, repository, providers, list & detail screens, add/edit form sheet, security rules, and tests.

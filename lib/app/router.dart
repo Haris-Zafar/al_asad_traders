@@ -10,6 +10,8 @@ import 'package:al_asad_traders/features/people/ui/buyer_detail_screen.dart';
 import 'package:al_asad_traders/features/people/ui/buyers_screen.dart';
 import 'package:al_asad_traders/features/people/ui/supplier_detail_screen.dart';
 import 'package:al_asad_traders/features/people/ui/suppliers_screen.dart';
+import 'package:al_asad_traders/features/products/ui/product_detail_screen.dart';
+import 'package:al_asad_traders/features/products/ui/product_list_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -144,6 +146,22 @@ GoRouter createRouter({
                     },
                   ),
                   GoRoute(
+                    path: 'products',
+                    builder: (BuildContext context, GoRouterState state) {
+                      return const ProductListScreen();
+                    },
+                    routes: <RouteBase>[
+                      GoRoute(
+                        path: ':id',
+                        builder: (BuildContext context, GoRouterState state) {
+                          return ProductDetailScreen(
+                            productId: state.pathParameters['id']!,
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                  GoRoute(
                     path: 'suppliers',
                     builder: (BuildContext context, GoRouterState state) {
                       return const SuppliersScreen();
@@ -252,6 +270,11 @@ class MoreTabScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
+            AppListRow(
+              key: const Key('more_products_row'),
+              title: AppStrings.productsTitle,
+              onTap: () => context.go('/more/products'),
+            ),
             AppListRow(
               key: const Key('more_suppliers_row'),
               title: AppStrings.suppliersTitle,
