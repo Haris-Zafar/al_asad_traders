@@ -3,6 +3,7 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+- Products management (add, edit, list, search, archive) with default prices and Firestore security rules (T-12).
 - Bank accounts management for business profile, buyers, and suppliers with single-owner validation and Firestore security rules (T-11).
 - Buyer and supplier management screens, form sheets, repositories, and Firestore security rules (T-10).
 - Business profile management screen (`/more/business`) and repository for updating business name, address, and contact numbers.
