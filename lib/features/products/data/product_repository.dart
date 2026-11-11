@@ -71,8 +71,9 @@ class ProductRepository {
   }
 
   /// Saves (creates or updates) a product record and batches `productSkus` creation/deletion.
+  /// Returns the product ID.
   /// Rule: docs/DATABASE.md > Atomic operations. Story: S1, S2.
-  Future<void> saveProduct(Product product) async {
+  Future<String> saveProduct(Product product) async {
     try {
       if (product.name.trim().isEmpty) {
         throw const ValidationException('Name cannot be empty');
@@ -83,7 +84,9 @@ class ProductRepository {
         throw const ValidationException('Prices cannot be negative');
       }
 
-      final String productId = product.id.isNotEmpty ? product.id : _productsRef.doc().id;
+      final String productId = product.id.isNotEmpty
+          ? product.id
+          : _productsRef.doc().id;
       final docRef = _productsRef.doc(productId);
 
       Product? existingProduct;
@@ -101,7 +104,9 @@ class ProductRepository {
       batch.set(docRef, finalProduct.toMap(), SetOptions(merge: true));
 
       final oldSku = existingProduct?.sku;
-      final newSku = finalProduct.sku?.trim().isEmpty ?? true ? null : finalProduct.sku!.trim();
+      final newSku = finalProduct.sku?.trim().isEmpty ?? true
+          ? null
+          : finalProduct.sku!.trim();
 
       if (oldSku != newSku) {
         if (oldSku != null && oldSku.isNotEmpty) {
@@ -111,17 +116,15 @@ class ProductRepository {
           } catch (_) {}
         }
         if (newSku != null && newSku.isNotEmpty) {
-          batch.set(
-            _firestore.doc('productSkus/$newSku'),
-            <String, dynamic>{
-              'productId': productId,
-              'createdAt': FieldValue.serverTimestamp(),
-            },
-          );
+          batch.set(_firestore.doc('productSkus/$newSku'), <String, dynamic>{
+            'productId': productId,
+            'createdAt': FieldValue.serverTimestamp(),
+          });
         }
       }
 
       await batch.commit();
+      return productId;
     } on FirebaseException catch (e) {
       throw _mapFirebaseException(e);
     } catch (e) {

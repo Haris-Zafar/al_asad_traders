@@ -112,62 +112,80 @@ void main() {
       expect(warnings, contains('Product is referenced in bills'));
     });
 
-    test('getProductBySku returns product when productSkus entry exists (S2)', () async {
-      final product = Product(
-        id: 'p-sku-1',
-        name: 'Tea 500g',
-        sku: '8901234567890',
-        defaultSupplierRate: 500,
-        defaultBuyerRate: 550,
-        defaultRetailPrice: 600,
-        createdAt: DateTime.now(),
-      );
-      await repository.saveProduct(product);
+    test(
+      'getProductBySku returns product when productSkus entry exists (S2)',
+      () async {
+        final product = Product(
+          id: 'p-sku-1',
+          name: 'Tea 500g',
+          sku: '8901234567890',
+          defaultSupplierRate: 500,
+          defaultBuyerRate: 550,
+          defaultRetailPrice: 600,
+          createdAt: DateTime.now(),
+        );
+        await repository.saveProduct(product);
 
-      final found = await repository.getProductBySku('8901234567890');
-      expect(found, isNotNull);
-      expect(found?.name, equals('Tea 500g'));
-      expect(found?.id, equals('p-sku-1'));
+        final found = await repository.getProductBySku('8901234567890');
+        expect(found, isNotNull);
+        expect(found?.name, equals('Tea 500g'));
+        expect(found?.id, equals('p-sku-1'));
 
-      final notFound = await repository.getProductBySku('0000000000000');
-      expect(notFound, isNull);
-    });
+        final notFound = await repository.getProductBySku('0000000000000');
+        expect(notFound, isNull);
+      },
+    );
 
-    test('saveProduct batches productSkus creation, updates and deletions (S2)', () async {
-      final product = Product(
-        id: 'p-batched',
-        name: 'Soap',
-        sku: 'SKU-OLD',
-        defaultSupplierRate: 50,
-        defaultBuyerRate: 60,
-        defaultRetailPrice: 70,
-        createdAt: DateTime.now(),
-      );
-      await repository.saveProduct(product);
+    test(
+      'saveProduct batches productSkus creation, updates and deletions (S2)',
+      () async {
+        final product = Product(
+          id: 'p-batched',
+          name: 'Soap',
+          sku: 'SKU-OLD',
+          defaultSupplierRate: 50,
+          defaultBuyerRate: 60,
+          defaultRetailPrice: 70,
+          createdAt: DateTime.now(),
+        );
+        await repository.saveProduct(product);
 
-      // Verify productSkus/SKU-OLD created
-      final oldSkuDoc = await firestore.collection('productSkus').doc('SKU-OLD').get();
-      expect(oldSkuDoc.exists, isTrue);
-      expect(oldSkuDoc.data()?['productId'], equals('p-batched'));
+        // Verify productSkus/SKU-OLD created
+        final oldSkuDoc = await firestore
+            .collection('productSkus')
+            .doc('SKU-OLD')
+            .get();
+        expect(oldSkuDoc.exists, isTrue);
+        expect(oldSkuDoc.data()?['productId'], equals('p-batched'));
 
-      // Update SKU to SKU-NEW
-      final updated = product.copyWith(sku: 'SKU-NEW');
-      await repository.saveProduct(updated);
+        // Update SKU to SKU-NEW
+        final updated = product.copyWith(sku: 'SKU-NEW');
+        await repository.saveProduct(updated);
 
-      // Verify old SKU deleted, new SKU created
-      final oldSkuAfter = await firestore.collection('productSkus').doc('SKU-OLD').get();
-      expect(oldSkuAfter.exists, isFalse);
+        // Verify old SKU deleted, new SKU created
+        final oldSkuAfter = await firestore
+            .collection('productSkus')
+            .doc('SKU-OLD')
+            .get();
+        expect(oldSkuAfter.exists, isFalse);
 
-      final newSkuDoc = await firestore.collection('productSkus').doc('SKU-NEW').get();
-      expect(newSkuDoc.exists, isTrue);
-      expect(newSkuDoc.data()?['productId'], equals('p-batched'));
+        final newSkuDoc = await firestore
+            .collection('productSkus')
+            .doc('SKU-NEW')
+            .get();
+        expect(newSkuDoc.exists, isTrue);
+        expect(newSkuDoc.data()?['productId'], equals('p-batched'));
 
-      // Remove SKU (set to null)
-      final removedSku = updated.copyWith(sku: null);
-      await repository.saveProduct(removedSku);
+        // Remove SKU (set to null)
+        final removedSku = updated.copyWith(sku: null);
+        await repository.saveProduct(removedSku);
 
-      final newSkuAfter = await firestore.collection('productSkus').doc('SKU-NEW').get();
-      expect(newSkuAfter.exists, isFalse);
-    });
+        final newSkuAfter = await firestore
+            .collection('productSkus')
+            .doc('SKU-NEW')
+            .get();
+        expect(newSkuAfter.exists, isFalse);
+      },
+    );
   });
 }

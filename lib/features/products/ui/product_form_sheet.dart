@@ -4,12 +4,14 @@ import 'package:al_asad_traders/core/widgets/app_button.dart';
 import 'package:al_asad_traders/core/widgets/app_sheet.dart';
 import 'package:al_asad_traders/core/widgets/app_text_field.dart';
 import 'package:al_asad_traders/features/products/data/product_repository.dart';
+import 'package:al_asad_traders/features/products/data/tag_repository.dart';
 import 'package:al_asad_traders/features/products/models/product.dart';
+import 'package:al_asad_traders/features/products/providers/product_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// Modal bottom sheet form for creating or editing a product.
-/// Rule: docs/UI_PLAN.md > Screens (/products). Story: S1.
+/// Modal bottom sheet form for creating or editing a product, including tags.
+/// Rule: docs/UI_PLAN.md > Screens (/products). Story: S1, S3.
 class ProductFormSheet extends ConsumerStatefulWidget {
   /// Creates a [ProductFormSheet].
   const ProductFormSheet({super.key, this.product});
@@ -38,6 +40,9 @@ class _ProductFormSheetState extends ConsumerState<ProductFormSheet> {
   late final TextEditingController _buyerRateController;
   late final TextEditingController _retailPriceController;
   late final TextEditingController _notesController;
+
+  final Set<String> _selectedTagIds = {};
+  bool _tagsInitialized = false;
 
   bool _isSaving = false;
   String? _errorMessage;
@@ -70,6 +75,49 @@ class _ProductFormSheetState extends ConsumerState<ProductFormSheet> {
     super.dispose();
   }
 
+  Future<void> _showAddTagDialog(BuildContext context) async {
+    final controller = TextEditingController();
+    final name = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text(AppStrings.addTag),
+        content: TextField(
+          key: const Key('add_tag_name_field'),
+          controller: controller,
+          decoration: const InputDecoration(labelText: AppStrings.tagNameLabel),
+          autofocus: true,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text(AppStrings.cancel),
+          ),
+          ElevatedButton(
+            key: const Key('add_tag_save_button'),
+            onPressed: () => Navigator.of(context).pop(controller.text.trim()),
+            child: const Text(AppStrings.save),
+          ),
+        ],
+      ),
+    );
+
+    if (name != null && name.isNotEmpty) {
+      try {
+        final tagRepo = ref.read(tagRepositoryProvider);
+        final newTag = await tagRepo.createTag(name);
+        setState(() {
+          _selectedTagIds.add(newTag.id);
+        });
+      } catch (e) {
+        if (mounted) {
+          setState(() {
+            _errorMessage = e.toString();
+          });
+        }
+      }
+    }
+  }
+
   Future<void> _handleSave() async {
     final nameText = _nameController.text.trim();
     if (nameText.isEmpty) {
@@ -97,10 +145,11 @@ class _ProductFormSheetState extends ConsumerState<ProductFormSheet> {
 
     try {
       final repository = ref.read(productRepositoryProvider);
+      final tagRepository = ref.read(tagRepositoryProvider);
       final skuText = _skuController.text.trim();
       final notesText = _notesController.text.trim();
 
-      final updatedProduct = Product(
+      final targetProduct = Product(
         id: widget.product?.id ?? '',
         name: nameText,
         sku: skuText.isEmpty ? null : skuText,
@@ -112,7 +161,14 @@ class _ProductFormSheetState extends ConsumerState<ProductFormSheet> {
         createdAt: widget.product?.createdAt ?? DateTime.now(),
       );
 
-      await repository.saveProduct(updatedProduct);
+      final String finalProductId = await repository.saveProduct(targetProduct);
+
+      // Assign selected tags
+      await tagRepository.assignTagsToProduct(
+        finalProductId,
+        _selectedTagIds.toList(),
+      );
+
       if (mounted) {
         Navigator.of(context).pop(true);
       }
@@ -128,6 +184,19 @@ class _ProductFormSheetState extends ConsumerState<ProductFormSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final tagsAsync = ref.watch(tagsStreamProvider);
+    if (widget.product != null && !_tagsInitialized) {
+      final initialTagsAsync = ref.watch(
+        productTagsForProductProvider(widget.product!.id),
+      );
+      initialTagsAsync.whenData((tagIds) {
+        if (!_tagsInitialized) {
+          _selectedTagIds.addAll(tagIds);
+          _tagsInitialized = true;
+        }
+      });
+    }
+
     return Form(
       key: _formKey,
       child: SingleChildScrollView(
@@ -182,6 +251,55 @@ class _ProductFormSheetState extends ConsumerState<ProductFormSheet> {
               controller: _notesController,
               label: AppStrings.notesLabel,
               maxLines: 2,
+            ),
+            const SizedBox(height: AppSpacing.m),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  AppStrings.tagsLabel,
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                TextButton.icon(
+                  key: const Key('add_tag_button'),
+                  onPressed: () => _showAddTagDialog(context),
+                  icon: const Icon(Icons.add, size: 18),
+                  label: const Text(AppStrings.addTag),
+                ),
+              ],
+            ),
+            tagsAsync.when(
+              data: (tags) {
+                if (tags.isEmpty) {
+                  return const Text(
+                    'No tags available. Tap "+ Add tag" to create one.',
+                    style: TextStyle(fontStyle: FontStyle.italic),
+                  );
+                }
+                return Wrap(
+                  spacing: AppSpacing.xs,
+                  runSpacing: AppSpacing.xs,
+                  children: tags.map((tag) {
+                    final isSelected = _selectedTagIds.contains(tag.id);
+                    return FilterChip(
+                      key: Key('product_form_tag_chip_${tag.id}'),
+                      label: Text(tag.name),
+                      selected: isSelected,
+                      onSelected: (selected) {
+                        setState(() {
+                          if (selected) {
+                            _selectedTagIds.add(tag.id);
+                          } else {
+                            _selectedTagIds.remove(tag.id);
+                          }
+                        });
+                      },
+                    );
+                  }).toList(),
+                );
+              },
+              loading: () => const LinearProgressIndicator(),
+              error: (e, _) => Text(e.toString()),
             ),
             const SizedBox(height: AppSpacing.l),
             AppButton(
