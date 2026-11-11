@@ -324,4 +324,29 @@ abstract final class AppStrings {
 
   /// Bank accounts section label.
   static const String bankAccounts = 'Bank accounts';
+
+  /// Bank name label.
+  static const String bankNameLabel = 'Bank name / Title';
+
+  /// Account number label.
+  static const String accountNumberLabel = 'Account number / IBAN';
+
+  /// Add bank account button label.
+  static const String addBankAccount = 'Add bank account';
+
+  /// Edit bank account button label.
+  static const String editBankAccount = 'Edit bank account';
+
+  /// No bank accounts message.
+  static const String noBankAccounts = 'No bank accounts added';
+
+  /// Bank account saved confirmation message.
+  static const String bankAccountSaved = 'Bank account saved';
+
+  /// Archive bank account title.
+  static const String archiveBankAccountTitle = 'Hide Bank Account';
+
+  /// Archive bank account warning message.
+  static const String archiveBankAccountWarning =
+      'Are you sure you want to hide this bank account?';
 }

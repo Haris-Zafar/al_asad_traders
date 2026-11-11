@@ -3,12 +3,14 @@ import 'package:al_asad_traders/core/errors/error_message.dart';
 import 'package:al_asad_traders/core/strings.dart';
 import 'package:al_asad_traders/core/theme/app_sizes.dart';
 import 'package:al_asad_traders/core/widgets/app_button.dart';
+import 'package:al_asad_traders/core/widgets/app_list_row.dart';
 import 'package:al_asad_traders/core/widgets/app_scaffold.dart';
 import 'package:al_asad_traders/core/widgets/app_text_field.dart';
 import 'package:al_asad_traders/core/widgets/error_panel.dart';
 import 'package:al_asad_traders/core/widgets/loading_view.dart';
 import 'package:al_asad_traders/features/people/models/profile.dart';
 import 'package:al_asad_traders/features/people/providers/profile_provider.dart';
+import 'package:al_asad_traders/features/people/ui/bank_accounts_list_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -125,6 +127,19 @@ class _BusinessProfileScreenState extends ConsumerState<BusinessProfileScreen> {
                     label: AppStrings.contactNumber2Label,
                     controller: _phone2Controller,
                     keyboardType: TextInputType.phone,
+                  ),
+                  const SizedBox(height: AppSpacing.l),
+                  AppListRow(
+                    key: const Key('profile_bank_accounts_row'),
+                    title: AppStrings.bankAccounts,
+                    subtitle: 'Manage own business bank accounts',
+                    onTap: () => BankAccountsListSheet.show(
+                      context,
+                      profileId: 'main',
+                      ownerName:
+                          profile?.businessName ??
+                          AppStrings.businessProfileTitle,
+                    ),
                   ),
                   const SizedBox(height: AppSpacing.xl),
                   AppButton(

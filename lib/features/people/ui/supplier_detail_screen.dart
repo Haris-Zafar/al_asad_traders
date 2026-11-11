@@ -9,6 +9,7 @@ import 'package:al_asad_traders/core/widgets/loading_view.dart';
 import 'package:al_asad_traders/features/people/data/suppliers_repository.dart';
 import 'package:al_asad_traders/features/people/models/supplier.dart';
 import 'package:al_asad_traders/features/people/providers/suppliers_provider.dart';
+import 'package:al_asad_traders/features/people/ui/bank_accounts_list_sheet.dart';
 import 'package:al_asad_traders/features/people/ui/supplier_form_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -127,7 +128,11 @@ class SupplierDetailScreen extends ConsumerWidget {
                     key: const Key('supplier_bank_accounts_row'),
                     title: AppStrings.bankAccounts,
                     subtitle: 'View saved bank accounts',
-                    onTap: () {},
+                    onTap: () => BankAccountsListSheet.show(
+                      context,
+                      supplierId: supplier.id,
+                      ownerName: supplier.name,
+                    ),
                   ),
                   const SizedBox(height: AppSpacing.xl),
                   ActionRow(

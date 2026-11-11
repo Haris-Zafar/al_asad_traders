@@ -103,7 +103,9 @@ void main() {
         expect(find.text('Top supplier'), findsOneWidget);
 
         // Archive supplier
-        await tester.ensureVisible(find.byKey(const Key('supplier_archive_button')));
+        await tester.ensureVisible(
+          find.byKey(const Key('supplier_archive_button')),
+        );
         await tester.tap(find.byKey(const Key('supplier_archive_button')));
         await tester.pumpAndSettle();
 

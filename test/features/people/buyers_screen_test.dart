@@ -103,7 +103,9 @@ void main() {
         expect(find.text('VIP Client'), findsOneWidget);
 
         // Archive buyer
-        await tester.ensureVisible(find.byKey(const Key('buyer_archive_button')));
+        await tester.ensureVisible(
+          find.byKey(const Key('buyer_archive_button')),
+        );
         await tester.tap(find.byKey(const Key('buyer_archive_button')));
         await tester.pumpAndSettle();
 

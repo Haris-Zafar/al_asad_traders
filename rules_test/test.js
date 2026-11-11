@@ -105,4 +105,91 @@ describe('Security Rules - Owner Auth (T-05)', () => {
     await assertFails(nonOwnerDb.collection('buyers').get());
     await assertFails(nonOwnerDb.collection('suppliers').get());
   });
+
+  it('allows owner to write valid bank account and enforces single owner constraint (T-11)', async () => {
+    const ownerDb = testEnv.authenticatedContext('po2rFc75KISIx5DuyyiQhznl3nM2').firestore();
+    const validAccount = {
+      profileId: 'main',
+      buyerId: null,
+      supplierId: null,
+      name: 'Meezan Bank',
+      accountNumber: 'PK36MEZN00012345678901',
+      notes: 'Main account',
+      archivedAt: null,
+      createdAt: new Date(),
+    };
+    await assertSucceeds(ownerDb.collection('bankAccounts').doc('ba1').set(validAccount));
+
+    // Valid buyer bank account
+    const buyerAccount = {
+      profileId: null,
+      buyerId: 'b1',
+      supplierId: null,
+      name: 'HBL',
+      accountNumber: '12345678',
+      notes: null,
+      archivedAt: null,
+      createdAt: new Date(),
+    };
+    await assertSucceeds(ownerDb.collection('bankAccounts').doc('ba2').set(buyerAccount));
+
+    // Valid supplier bank account
+    const supplierAccount = {
+      profileId: null,
+      buyerId: null,
+      supplierId: 's1',
+      name: 'UBL',
+      accountNumber: '87654321',
+      notes: null,
+      archivedAt: null,
+      createdAt: new Date(),
+    };
+    await assertSucceeds(ownerDb.collection('bankAccounts').doc('ba3').set(supplierAccount));
+
+    // Invalid: no owner
+    const noOwnerAccount = {
+      profileId: null,
+      buyerId: null,
+      supplierId: null,
+      name: 'No Owner Bank',
+      accountNumber: '1111',
+      notes: null,
+      archivedAt: null,
+      createdAt: new Date(),
+    };
+    await assertFails(ownerDb.collection('bankAccounts').doc('ba4').set(noOwnerAccount));
+
+    // Invalid: multiple owners
+    const multiOwnerAccount = {
+      profileId: 'main',
+      buyerId: 'b1',
+      supplierId: null,
+      name: 'Multi Owner Bank',
+      accountNumber: '2222',
+      notes: null,
+      archivedAt: null,
+      createdAt: new Date(),
+    };
+    await assertFails(ownerDb.collection('bankAccounts').doc('ba5').set(multiOwnerAccount));
+
+    // Invalid: delete is prohibited
+    await assertFails(ownerDb.collection('bankAccounts').doc('ba1').delete());
+  });
+
+  it('denies non-owner to read or write bankAccounts (T-11)', async () => {
+    const nonOwnerDb = testEnv.authenticatedContext('other-uid').firestore();
+    await assertFails(nonOwnerDb.collection('bankAccounts').get());
+    await assertFails(
+      nonOwnerDb.collection('bankAccounts').doc('ba1').set({
+        profileId: 'main',
+        buyerId: null,
+        supplierId: null,
+        name: 'Meezan Bank',
+        accountNumber: 'PK36MEZN00012345678901',
+        notes: null,
+        archivedAt: null,
+        createdAt: new Date(),
+      }),
+    );
+  });
 });
