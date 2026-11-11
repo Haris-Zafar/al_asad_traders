@@ -55,6 +55,13 @@ service cloud.firestore {
         && d.createdAt is timestamp;
     }
 
+    function validProductSku(d) {
+      return d.keys().hasAll(['productId', 'createdAt'])
+        && d.keys().hasOnly(['productId', 'createdAt'])
+        && d.productId is string && d.productId.size() > 0
+        && d.createdAt is timestamp;
+    }
+
     match /buyers/{id} {
       allow read: if owner();
       allow create, update: if owner() && validBuyer(request.resource.data);
@@ -77,6 +84,13 @@ service cloud.firestore {
       allow read: if owner();
       allow create, update: if owner() && validProduct(request.resource.data);
       allow delete: if false;
+    }
+
+    match /productSkus/{id} {
+      allow read: if owner();
+      allow create: if owner() && validProductSku(request.resource.data) && !exists(/databases/$(database)/documents/productSkus/$(id));
+      allow delete: if owner();
+      allow update: if false;
     }
 
     match /bills/{id} {

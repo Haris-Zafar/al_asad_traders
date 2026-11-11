@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 
+const Object _sentinel = Object();
+
 @immutable
 /// Model representing a product in the system.
 /// Rule: wholesale_project.md > Products. Story: S1, S4.
@@ -94,23 +96,23 @@ class Product {
   Product copyWith({
     String? id,
     String? name,
-    String? sku,
+    Object? sku = _sentinel,
     int? defaultSupplierRate,
     int? defaultBuyerRate,
     int? defaultRetailPrice,
-    String? notes,
-    DateTime? archivedAt,
+    Object? notes = _sentinel,
+    Object? archivedAt = _sentinel,
     DateTime? createdAt,
   }) {
     return Product(
       id: id ?? this.id,
       name: name ?? this.name,
-      sku: sku ?? this.sku,
+      sku: sku == _sentinel ? this.sku : (sku as String?),
       defaultSupplierRate: defaultSupplierRate ?? this.defaultSupplierRate,
       defaultBuyerRate: defaultBuyerRate ?? this.defaultBuyerRate,
       defaultRetailPrice: defaultRetailPrice ?? this.defaultRetailPrice,
-      notes: notes ?? this.notes,
-      archivedAt: archivedAt ?? this.archivedAt,
+      notes: notes == _sentinel ? this.notes : (notes as String?),
+      archivedAt: archivedAt == _sentinel ? this.archivedAt : (archivedAt as DateTime?),
       createdAt: createdAt ?? this.createdAt,
     );
   }

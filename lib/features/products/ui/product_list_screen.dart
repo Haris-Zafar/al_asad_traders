@@ -53,10 +53,20 @@ class ProductListScreen extends ConsumerWidget {
                       ),
                       const SizedBox(width: AppSpacing.s),
                       AppButton(
+                        key: const Key('products_scan_button'),
+                        label: AppStrings.scan,
+                        icon: Icons.qr_code_scanner,
+                        width: 100,
+                        onPressed: () {
+                          context.push('/scan');
+                        },
+                      ),
+                      const SizedBox(width: AppSpacing.s),
+                      AppButton(
                         key: const Key('add_product_button'),
                         label: AppStrings.addProduct,
                         icon: Icons.add,
-                        width: 150,
+                        width: 130,
                         onPressed: () {
                           ProductFormSheet.show(context);
                         },

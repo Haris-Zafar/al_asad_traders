@@ -69,6 +69,9 @@ abstract final class AppStrings {
   /// Plain term for SKU / barcode.
   static const String barcode = 'Barcode';
 
+  /// Plain term for scan action.
+  static const String scan = 'Scan';
+
   /// Plain term for buyer-specific rate.
   static const String priceForThisBuyer = 'Price for this buyer';
 

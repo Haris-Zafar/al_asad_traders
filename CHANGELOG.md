@@ -3,6 +3,7 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+- Product barcode scanning & lookup via `productSkus` collection and MobileScanner integration (T-13).
 - Products management (add, edit, list, search, archive) with default prices and Firestore security rules (T-12).
 - Bank accounts management for business profile, buyers, and suppliers with single-owner validation and Firestore security rules (T-11).
 - Buyer and supplier management screens, form sheets, repositories, and Firestore security rules (T-10).
