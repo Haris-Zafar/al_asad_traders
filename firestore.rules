@@ -27,6 +27,21 @@ service cloud.firestore {
         && d.createdAt is timestamp;
     }
 
+    function validBankAccount(d) {
+      return d.keys().hasAll(['profileId', 'buyerId', 'supplierId', 'name', 'accountNumber', 'notes', 'archivedAt', 'createdAt'])
+        && d.keys().hasOnly(['profileId', 'buyerId', 'supplierId', 'name', 'accountNumber', 'notes', 'archivedAt', 'createdAt'])
+        && d.name is string && d.name.size() > 0
+        && d.accountNumber is string && d.accountNumber.size() > 0
+        && (d.notes == null || d.notes is string)
+        && (d.archivedAt == null || d.archivedAt is timestamp)
+        && d.createdAt is timestamp
+        && (
+          (d.profileId is string && d.profileId.size() > 0 && d.buyerId == null && d.supplierId == null) ||
+          (d.profileId == null && d.buyerId is string && d.buyerId.size() > 0 && d.supplierId == null) ||
+          (d.profileId == null && d.buyerId == null && d.supplierId is string && d.supplierId.size() > 0)
+        );
+    }
+
     match /buyers/{id} {
       allow read: if owner();
       allow create, update: if owner() && validBuyer(request.resource.data);
@@ -36,6 +51,12 @@ service cloud.firestore {
     match /suppliers/{id} {
       allow read: if owner();
       allow create, update: if owner() && validSupplier(request.resource.data);
+      allow delete: if false;
+    }
+
+    match /bankAccounts/{id} {
+      allow read: if owner();
+      allow create, update: if owner() && validBankAccount(request.resource.data);
       allow delete: if false;
     }
 
