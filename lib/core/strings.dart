@@ -340,6 +340,21 @@ abstract final class AppStrings {
   /// Default selling price field label.
   static const String defaultSellingPrice = 'Default selling price';
 
+  /// Tags label.
+  static const String tagsLabel = 'Tags';
+
+  /// All tags filter option label.
+  static const String allTags = 'All';
+
+  /// Add tag button/dialog title label.
+  static const String addTag = 'Add tag';
+
+  /// Tag name field label/hint.
+  static const String tagNameLabel = 'Tag name';
+
+  /// Tag created confirmation message.
+  static const String tagCreated = 'Tag created';
+
   /// Shop price field label.
   static const String shopPriceLabel = 'Shop price';
 
@@ -395,7 +410,8 @@ abstract final class AppStrings {
   static const String archiveBankAccountTitle = 'Hide Bank Account';
 
   /// Archive bank account warning message.
-  static const String archiveBankAccountWarning = 'Hiding this bank account removes it from future transactions.';
+  static const String archiveBankAccountWarning =
+      'Hiding this bank account removes it from future transactions.';
 
   /// Scan error message prefix.
   static const String scanError = 'Scan error';

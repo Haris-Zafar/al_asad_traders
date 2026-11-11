@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-/// Screen listing products with search, filter, and add actions.
+/// Screen listing products with search, tag filter, and add actions.
 /// Rule: docs/UI_PLAN.md > Screens (/products). Story: S1, S3, S4.
 class ProductListScreen extends ConsumerWidget {
   /// Creates a [ProductListScreen].
@@ -21,6 +21,8 @@ class ProductListScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final filteredProductsAsync = ref.watch(filteredProductsProvider);
     final showArchived = ref.watch(productsShowArchivedProvider);
+    final tagsAsync = ref.watch(tagsStreamProvider);
+    final selectedTagId = ref.watch(selectedTagIdProvider);
     final theme = Theme.of(context);
 
     return AppScaffold(
@@ -37,6 +39,7 @@ class ProductListScreen extends ConsumerWidget {
                 vertical: AppSpacing.s,
               ),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Row(
                     children: [
@@ -74,20 +77,55 @@ class ProductListScreen extends ConsumerWidget {
                     ],
                   ),
                   const SizedBox(height: AppSpacing.xs),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      FilterChip(
-                        key: const Key('products_show_archived_chip'),
-                        label: const Text(AppStrings.showHidden),
-                        selected: showArchived,
-                        onSelected: (selected) {
-                          ref
-                              .read(productsShowArchivedProvider.notifier)
-                              .toggle(selected);
-                        },
-                      ),
-                    ],
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        FilterChip(
+                          key: const Key('tag_chip_all'),
+                          label: const Text(AppStrings.allTags),
+                          selected: selectedTagId == null,
+                          onSelected: (_) {
+                            ref
+                                .read(selectedTagIdProvider.notifier)
+                                .selectTag(null);
+                          },
+                        ),
+                        const SizedBox(width: AppSpacing.xs),
+                        ...tagsAsync.when(
+                          data: (tags) => tags.map((tag) {
+                            final isSelected = selectedTagId == tag.id;
+                            return Padding(
+                              padding: const EdgeInsets.only(
+                                right: AppSpacing.xs,
+                              ),
+                              child: FilterChip(
+                                key: Key('tag_chip_${tag.id}'),
+                                label: Text(tag.name),
+                                selected: isSelected,
+                                onSelected: (selected) {
+                                  ref
+                                      .read(selectedTagIdProvider.notifier)
+                                      .selectTag(selected ? tag.id : null);
+                                },
+                              ),
+                            );
+                          }),
+                          loading: () => const [],
+                          error: (_, _) => const [],
+                        ),
+                        FilterChip(
+                          key: const Key('products_show_archived_chip'),
+                          label: const Text(AppStrings.showHidden),
+                          selected: showArchived,
+                          onSelected: (selected) {
+                            ref
+                                .read(productsShowArchivedProvider.notifier)
+                                .toggle(selected);
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),

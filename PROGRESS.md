@@ -15,12 +15,13 @@ Updated: 2026-11-10
 - T-11 Bank accounts (own, buyers, suppliers) (completed 2026-11-10)
 - T-12 Add and list products (completed 2026-11-10)
 - T-13 Product barcode scanning & lookup (completed 2026-11-10)
+- T-14 Product tagging and filtering (completed 2026-11-10)
 
 ## Now
-- T-14 Product tagging and filtering: ready to start
+- T-15 Archive products: ready to start
 
 ## Blocked
 - none
 
 ## Notes for the next chat
-- T-12 completed with Product model, repository, providers, list & detail screens, add/edit form sheet, security rules, and tests.
+- T-14 completed with Tag and ProductTag models, TagRepository, providers, tag filtering on product list screen, tag assignment in form sheet, security rules, and tests.

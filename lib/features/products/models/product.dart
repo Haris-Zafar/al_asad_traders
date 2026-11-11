@@ -112,7 +112,9 @@ class Product {
       defaultBuyerRate: defaultBuyerRate ?? this.defaultBuyerRate,
       defaultRetailPrice: defaultRetailPrice ?? this.defaultRetailPrice,
       notes: notes == _sentinel ? this.notes : (notes as String?),
-      archivedAt: archivedAt == _sentinel ? this.archivedAt : (archivedAt as DateTime?),
+      archivedAt: archivedAt == _sentinel
+          ? this.archivedAt
+          : (archivedAt as DateTime?),
       createdAt: createdAt ?? this.createdAt,
     );
   }

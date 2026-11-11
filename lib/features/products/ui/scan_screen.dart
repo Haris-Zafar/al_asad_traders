@@ -61,9 +61,9 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
         setState(() {
           _isProcessing = false;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text(AppStrings.errorGeneric)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text(AppStrings.errorGeneric)));
       }
     }
   }

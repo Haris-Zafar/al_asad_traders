@@ -13,7 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Screen displaying details of a specific product.
-/// Rule: docs/UI_PLAN.md > Screens (/products/:id). Story: S1, S4.
+/// Rule: docs/UI_PLAN.md > Screens (/products/:id). Story: S1, S3, S4.
 class ProductDetailScreen extends ConsumerWidget {
   /// Creates a [ProductDetailScreen].
   const ProductDetailScreen({super.key, required this.productId});
@@ -56,6 +56,10 @@ class ProductDetailScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final productAsync = ref.watch(productDetailStreamProvider(productId));
+    final productTagsAsync = ref.watch(
+      productTagsForProductProvider(productId),
+    );
+    final tagsAsync = ref.watch(tagsStreamProvider);
     final theme = Theme.of(context);
 
     return AppScaffold(
@@ -65,6 +69,12 @@ class ProductDetailScreen extends ConsumerWidget {
           if (product == null) {
             return const Center(child: Text(AppStrings.noProductsFound));
           }
+
+          final tagIds = productTagsAsync.value ?? [];
+          final allTags = tagsAsync.value ?? [];
+          final assignedTags = allTags
+              .where((t) => tagIds.contains(t.id))
+              .toList();
 
           return KeyedSubtree(
             key: const Key('product_detail_screen'),
@@ -104,6 +114,26 @@ class ProductDetailScreen extends ConsumerWidget {
                     ],
                   ),
                   const SizedBox(height: AppSpacing.m),
+                  if (assignedTags.isNotEmpty) ...[
+                    Text(
+                      AppStrings.tagsLabel,
+                      style: theme.textTheme.titleSmall,
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                    Wrap(
+                      spacing: AppSpacing.xs,
+                      runSpacing: AppSpacing.xs,
+                      children: assignedTags
+                          .map(
+                            (tag) => Chip(
+                              key: Key('product_detail_tag_${tag.id}'),
+                              label: Text(tag.name),
+                            ),
+                          )
+                          .toList(),
+                    ),
+                    const SizedBox(height: AppSpacing.m),
+                  ],
                   if (product.sku != null && product.sku!.isNotEmpty)
                     AppListRow(
                       key: const Key('product_sku_row'),

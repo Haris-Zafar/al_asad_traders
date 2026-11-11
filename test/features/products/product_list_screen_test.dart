@@ -1,4 +1,5 @@
 import 'package:al_asad_traders/features/products/data/product_repository.dart';
+import 'package:al_asad_traders/features/products/data/tag_repository.dart';
 import 'package:al_asad_traders/features/products/models/product.dart';
 import 'package:al_asad_traders/features/products/ui/product_detail_screen.dart';
 import 'package:al_asad_traders/features/products/ui/product_list_screen.dart';
@@ -13,10 +14,12 @@ void main() {
   group('ProductListScreen & ProductDetailScreen (S1, S3, S4)', () {
     late FakeFirebaseFirestore firestore;
     late ProductRepository repo;
+    late TagRepository tagRepo;
 
     setUp(() {
       firestore = FakeFirebaseFirestore();
       repo = ProductRepository(firestore);
+      tagRepo = TagRepository(firestore);
     });
 
     testWidgets(
@@ -44,7 +47,10 @@ void main() {
         await repo.saveProduct(p2);
 
         final container = ProviderContainer(
-          overrides: [productRepositoryProvider.overrideWithValue(repo)],
+          overrides: [
+            productRepositoryProvider.overrideWithValue(repo),
+            tagRepositoryProvider.overrideWithValue(tagRepo),
+          ],
         );
 
         await tester.pumpApp(const ProductListScreen(), container: container);
@@ -76,6 +82,9 @@ void main() {
           find.byKey(const Key('product_retail_price_field')),
           '500',
         );
+        await tester.ensureVisible(
+          find.byKey(const Key('product_save_button')),
+        );
         await tester.tap(find.byKey(const Key('product_save_button')));
         await tester.pumpAndSettle();
 
@@ -83,6 +92,60 @@ void main() {
         expect(products.any((p) => p.name == 'Tea 500g'), isTrue);
       },
     );
+
+    testWidgets('ProductListScreen filters products by tag (S3)', (
+      WidgetTester tester,
+    ) async {
+      final p1 = Product(
+        id: 'p1',
+        name: 'Cumin 1kg',
+        defaultSupplierRate: 100,
+        defaultBuyerRate: 110,
+        defaultRetailPrice: 120,
+        createdAt: DateTime.now(),
+      );
+      final p2 = Product(
+        id: 'p2',
+        name: 'Rice 5kg',
+        defaultSupplierRate: 400,
+        defaultBuyerRate: 450,
+        defaultRetailPrice: 500,
+        createdAt: DateTime.now(),
+      );
+      await repo.saveProduct(p1);
+      await repo.saveProduct(p2);
+
+      final tag = await tagRepo.createTag('Spices');
+      await tagRepo.assignTagsToProduct('p1', [tag.id]);
+
+      final container = ProviderContainer(
+        overrides: [
+          productRepositoryProvider.overrideWithValue(repo),
+          tagRepositoryProvider.overrideWithValue(tagRepo),
+        ],
+      );
+
+      await tester.pumpApp(const ProductListScreen(), container: container);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Cumin 1kg'), findsOneWidget);
+      expect(find.text('Rice 5kg'), findsOneWidget);
+      expect(find.byKey(Key('tag_chip_${tag.id}')), findsOneWidget);
+
+      // Select Spices tag chip
+      await tester.tap(find.byKey(Key('tag_chip_${tag.id}')));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Cumin 1kg'), findsOneWidget);
+      expect(find.text('Rice 5kg'), findsNothing);
+
+      // Select All tag chip
+      await tester.tap(find.byKey(const Key('tag_chip_all')));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Cumin 1kg'), findsOneWidget);
+      expect(find.text('Rice 5kg'), findsOneWidget);
+    });
 
     testWidgets(
       'ProductDetailScreen displays details and handles archive/unarchive',
@@ -100,7 +163,10 @@ void main() {
         await repo.saveProduct(product);
 
         final container = ProviderContainer(
-          overrides: [productRepositoryProvider.overrideWithValue(repo)],
+          overrides: [
+            productRepositoryProvider.overrideWithValue(repo),
+            tagRepositoryProvider.overrideWithValue(tagRepo),
+          ],
         );
 
         await tester.pumpApp(
