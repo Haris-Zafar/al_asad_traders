@@ -109,7 +109,7 @@ void main() {
         // Tap Buyers tab
         await tester.tap(find.byKey(const Key('tab_buyers')));
         await tester.pumpAndSettle();
-        expect(find.byKey(const Key('buyers_tab_screen')), findsOneWidget);
+        expect(find.byKey(const Key('buyers_screen')), findsOneWidget);
 
         // Tap More tab
         await tester.tap(find.byKey(const Key('tab_more')));

@@ -230,4 +230,98 @@ abstract final class AppStrings {
   /// Business profile saved success message.
   static const String businessProfileSaved =
       'Business profile saved successfully';
+
+  // Buyers & Suppliers (S9)
+
+  /// Suppliers menu item and screen title.
+  static const String suppliersTitle = 'Suppliers';
+
+  /// Add supplier button label.
+  static const String addSupplier = 'Add supplier';
+
+  /// Edit buyer title.
+  static const String editBuyer = 'Edit buyer';
+
+  /// Edit supplier title.
+  static const String editSupplier = 'Edit supplier';
+
+  /// Buyer details screen title.
+  static const String buyerDetails = 'Buyer details';
+
+  /// Supplier details screen title.
+  static const String supplierDetails = 'Supplier details';
+
+  /// Name field label.
+  static const String nameLabel = 'Name';
+
+  /// Contact number field label.
+  static const String contactNumberLabel = 'Contact number';
+
+  /// Address field label.
+  static const String addressLabel = 'Address';
+
+  /// Notes field label.
+  static const String notesLabel = 'Notes';
+
+  /// Unhide action button label.
+  static const String unhide = 'Unhide';
+
+  /// Archived/hidden status label.
+  static const String archived = 'Hidden';
+
+  /// Show hidden items toggle label.
+  static const String showHidden = 'Show hidden';
+
+  /// Archive buyer dialog title.
+  static const String archiveBuyerTitle = 'Hide buyer';
+
+  /// Archive supplier dialog title.
+  static const String archiveSupplierTitle = 'Hide supplier';
+
+  /// Archive buyer warning dialog message.
+  static const String archiveBuyerWarning =
+      'This buyer has active balance, bills, or demands. Are you sure you want to hide this buyer?';
+
+  /// Archive supplier warning dialog message.
+  static const String archiveSupplierWarning =
+      'This supplier has open buying lists. Are you sure you want to hide this supplier?';
+
+  /// Confirm hide action label.
+  static const String confirmHide = 'Yes, hide';
+
+  /// Empty state message for buyers list.
+  static const String noBuyersFound = 'No buyers found';
+
+  /// Empty state message for suppliers list.
+  static const String noSuppliersFound = 'No suppliers found';
+
+  /// Search field hint for buyers.
+  static const String searchBuyers = 'Search buyers';
+
+  /// Search field hint for suppliers.
+  static const String searchSuppliers = 'Search suppliers';
+
+  /// Buyer saved confirmation message.
+  static const String buyerSaved = 'Buyer saved successfully';
+
+  /// Supplier saved confirmation message.
+  static const String supplierSaved = 'Supplier saved successfully';
+
+  /// Buyer hidden confirmation message.
+  static const String buyerArchived = 'Buyer hidden';
+
+  /// Supplier hidden confirmation message.
+  static const String supplierArchived = 'Supplier hidden';
+
+  /// Buyer unhidden confirmation message.
+  static const String buyerUnarchived = 'Buyer unhidden';
+
+  /// Supplier unhidden confirmation message.
+  static const String supplierUnarchived = 'Supplier unhidden';
+
+  /// Account balance label.
+  static const String accountBalance = 'Account balance';
+
+  /// Bank accounts section label.
+  static const String bankAccounts = 'Bank accounts';
 }

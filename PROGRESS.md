@@ -11,12 +11,13 @@ Updated: 2026-11-10
 - T-07 Sync state provider & sync chip (completed 2026-11-10)
 - T-08 Logout warning & dialog (completed 2026-11-10)
 - T-09 Profile screen & My business (completed 2026-11-10)
+- T-10 Buyer and supplier management (completed 2026-11-10)
 
 ## Now
-- T-10 Buyer and supplier management: ready to start
+- T-11 Bank accounts (own, buyers, suppliers): ready to start
 
 ## Blocked
 - none
 
 ## Notes for the next chat
-- T-09 completed with Profile model, ProfileRepository, BusinessProfileScreen (`/more/business`), and security rules test for `profile/main`.
+- T-10 completed with Buyer & Supplier models, repositories, providers, forms, screens (/buyers, /buyers/:id, /more/suppliers, /more/suppliers/:id), and Firestore security rules & unit tests.
