@@ -62,7 +62,7 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
           _isProcessing = false;
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Scan error: ${e.toString()}')),
+          SnackBar(content: Text('${AppStrings.scanError}: ${e.toString()}')),
         );
       }
     }
@@ -70,6 +70,10 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
     return AppScaffold(
       title: AppStrings.barcode,
       body: Stack(
@@ -90,21 +94,25 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
           ),
           if (_notFoundSku != null)
             Container(
-              color: Colors.black54,
+              color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.9),
               padding: const EdgeInsets.all(AppSpacing.l),
               alignment: Alignment.center,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text(
-                    'No product with this barcode',
-                    style: TextStyle(color: Colors.white, fontSize: 18),
+                  Text(
+                    AppStrings.noProductWithBarcode,
+                    style: textTheme.titleMedium?.copyWith(
+                      color: colorScheme.onSurface,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: AppSpacing.m),
                   Text(
                     _notFoundSku!,
-                    style: const TextStyle(color: Colors.white70),
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
                   ),
                   const SizedBox(height: AppSpacing.l),
                   AppButton(
@@ -143,7 +151,12 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
                         _isProcessing = false;
                       });
                     },
-                    child: const Text('Scan again', style: TextStyle(color: Colors.white)),
+                    child: Text(
+                      AppStrings.scanAgain,
+                      style: textTheme.labelLarge?.copyWith(
+                        color: colorScheme.primary,
+                      ),
+                    ),
                   ),
                 ],
               ),
