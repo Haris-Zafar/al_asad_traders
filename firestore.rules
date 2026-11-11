@@ -42,6 +42,19 @@ service cloud.firestore {
         );
     }
 
+    function validProduct(d) {
+      return d.keys().hasAll(['name', 'sku', 'defaultSupplierRate', 'defaultBuyerRate', 'defaultRetailPrice', 'notes', 'archivedAt', 'createdAt'])
+        && d.keys().hasOnly(['name', 'sku', 'defaultSupplierRate', 'defaultBuyerRate', 'defaultRetailPrice', 'notes', 'archivedAt', 'createdAt'])
+        && d.name is string && d.name.size() > 0
+        && (d.sku == null || d.sku is string)
+        && d.defaultSupplierRate is int && d.defaultSupplierRate >= 0
+        && d.defaultBuyerRate is int && d.defaultBuyerRate >= 0
+        && d.defaultRetailPrice is int && d.defaultRetailPrice >= 0
+        && (d.notes == null || d.notes is string)
+        && (d.archivedAt == null || d.archivedAt is timestamp)
+        && d.createdAt is timestamp;
+    }
+
     match /buyers/{id} {
       allow read: if owner();
       allow create, update: if owner() && validBuyer(request.resource.data);
@@ -57,6 +70,12 @@ service cloud.firestore {
     match /bankAccounts/{id} {
       allow read: if owner();
       allow create, update: if owner() && validBankAccount(request.resource.data);
+      allow delete: if false;
+    }
+
+    match /products/{id} {
+      allow read: if owner();
+      allow create, update: if owner() && validProduct(request.resource.data);
       allow delete: if false;
     }
 

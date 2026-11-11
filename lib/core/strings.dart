@@ -295,6 +295,51 @@ abstract final class AppStrings {
   /// Empty state message for suppliers list.
   static const String noSuppliersFound = 'No suppliers found';
 
+  // Products (S1, S4)
+
+  /// Products screen title.
+  static const String productsTitle = 'Products';
+
+  /// Add product button label.
+  static const String addProduct = 'Add product';
+
+  /// Edit product title.
+  static const String editProduct = 'Edit product';
+
+  /// Product details screen title.
+  static const String productDetails = 'Product details';
+
+  /// Search field hint for products.
+  static const String searchProducts = 'Search products';
+
+  /// Empty state message for products list.
+  static const String noProductsFound = 'No products found';
+
+  /// Product saved success message.
+  static const String productSaved = 'Product saved successfully';
+
+  /// Product hidden confirmation message.
+  static const String productArchived = 'Product hidden';
+
+  /// Product unhidden confirmation message.
+  static const String productUnarchived = 'Product unhidden';
+
+  /// Archive product dialog title.
+  static const String archiveProductTitle = 'Hide product';
+
+  /// Archive product warning message.
+  static const String archiveProductWarning =
+      'Are you sure you want to hide this product?';
+
+  /// Default buying price field label.
+  static const String defaultBuyingPrice = 'Default buying price';
+
+  /// Default selling price field label.
+  static const String defaultSellingPrice = 'Default selling price';
+
+  /// Shop price field label.
+  static const String shopPriceLabel = 'Shop price';
+
   /// Search field hint for buyers.
   static const String searchBuyers = 'Search buyers';
 
