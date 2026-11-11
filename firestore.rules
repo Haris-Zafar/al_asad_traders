@@ -62,6 +62,20 @@ service cloud.firestore {
         && d.createdAt is timestamp;
     }
 
+    function validTag(d) {
+      return d.keys().hasAll(['name', 'createdAt'])
+        && d.keys().hasOnly(['name', 'createdAt'])
+        && d.name is string && d.name.size() > 0
+        && d.createdAt is timestamp;
+    }
+
+    function validProductTag(d) {
+      return d.keys().hasAll(['productId', 'tagId'])
+        && d.keys().hasOnly(['productId', 'tagId'])
+        && d.productId is string && d.productId.size() > 0
+        && d.tagId is string && d.tagId.size() > 0;
+    }
+
     match /buyers/{id} {
       allow read: if owner();
       allow create, update: if owner() && validBuyer(request.resource.data);
@@ -91,6 +105,18 @@ service cloud.firestore {
       allow create: if owner() && validProductSku(request.resource.data) && !exists(/databases/$(database)/documents/productSkus/$(id));
       allow delete: if owner();
       allow update: if false;
+    }
+
+    match /tags/{id} {
+      allow read: if owner();
+      allow create, update: if owner() && validTag(request.resource.data);
+      allow delete: if owner();
+    }
+
+    match /productTags/{id} {
+      allow read: if owner();
+      allow create, update: if owner() && validProductTag(request.resource.data) && id == request.resource.data.productId + '_' + request.resource.data.tagId;
+      allow delete: if owner();
     }
 
     match /bills/{id} {

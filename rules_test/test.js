@@ -255,4 +255,43 @@ describe('Security Rules - Owner Auth (T-05)', () => {
       }),
     );
   });
+
+  it('allows owner to manage valid tag documents and denies invalid/non-owner (T-14)', async () => {
+    const ownerDb = testEnv.authenticatedContext('po2rFc75KISIx5DuyyiQhznl3nM2').firestore();
+    const validTag = {
+      name: 'Spices',
+      createdAt: new Date(),
+    };
+    await assertSucceeds(ownerDb.collection('tags').doc('spices').set(validTag));
+    await assertSucceeds(ownerDb.collection('tags').doc('spices').get());
+    await assertSucceeds(ownerDb.collection('tags').doc('spices').delete());
+
+    // Invalid tag
+    await assertFails(ownerDb.collection('tags').doc('invalid').set({ name: '' }));
+
+    // Non-owner
+    const nonOwnerDb = testEnv.authenticatedContext('other-uid').firestore();
+    await assertFails(nonOwnerDb.collection('tags').get());
+    await assertFails(nonOwnerDb.collection('tags').doc('spices').set(validTag));
+  });
+
+  it('allows owner to manage valid productTags with doc ID format productId_tagId (T-14)', async () => {
+    const ownerDb = testEnv.authenticatedContext('po2rFc75KISIx5DuyyiQhznl3nM2').firestore();
+    const validProductTag = {
+      productId: 'p1',
+      tagId: 'spices',
+    };
+    // Succeeds with correct doc ID `p1_spices`
+    await assertSucceeds(ownerDb.collection('productTags').doc('p1_spices').set(validProductTag));
+    await assertSucceeds(ownerDb.collection('productTags').doc('p1_spices').get());
+    await assertSucceeds(ownerDb.collection('productTags').doc('p1_spices').delete());
+
+    // Fails with mismatched doc ID
+    await assertFails(ownerDb.collection('productTags').doc('wrong_doc_id').set(validProductTag));
+
+    // Non-owner
+    const nonOwnerDb = testEnv.authenticatedContext('other-uid').firestore();
+    await assertFails(nonOwnerDb.collection('productTags').get());
+    await assertFails(nonOwnerDb.collection('productTags').doc('p1_spices').set(validProductTag));
+  });
 });
