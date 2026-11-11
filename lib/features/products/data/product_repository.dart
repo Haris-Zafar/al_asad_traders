@@ -49,8 +49,29 @@ class ProductRepository {
     }
   }
 
-  /// Saves (creates or updates) a product record.
-  /// Rule: docs/ARCHITECTURE.md > Writes and offline. Story: S1.
+  /// Retrieves a product by its barcode [sku] via `productSkus` collection lookup.
+  /// Rule: docs/DATABASE.md > Key queries. Story: S2.
+  Future<Product?> getProductBySku(String sku) async {
+    try {
+      final skuDoc = await _firestore.collection('productSkus').doc(sku).get();
+      if (!skuDoc.exists || skuDoc.data() == null) {
+        return null;
+      }
+      final productId = skuDoc.data()!['productId'] as String?;
+      if (productId == null || productId.isEmpty) {
+        return null;
+      }
+      return await getProduct(productId);
+    } on FirebaseException catch (e) {
+      throw _mapFirebaseException(e);
+    } catch (e) {
+      if (e is AppException) rethrow;
+      throw UnknownException(AppStrings.errorGeneric, e);
+    }
+  }
+
+  /// Saves (creates or updates) a product record and batches `productSkus` creation/deletion.
+  /// Rule: docs/DATABASE.md > Atomic operations. Story: S1, S2.
   Future<void> saveProduct(Product product) async {
     try {
       if (product.name.trim().isEmpty) {
@@ -62,18 +83,45 @@ class ProductRepository {
         throw const ValidationException('Prices cannot be negative');
       }
 
-      if (product.id.isEmpty) {
-        final docRef = _productsRef.doc();
-        final newProduct = product.copyWith(
-          id: docRef.id,
-          createdAt: product.createdAt,
-        );
-        await docRef.set(newProduct.toMap());
-      } else {
-        await _productsRef
-            .doc(product.id)
-            .set(product.toMap(), SetOptions(merge: true));
+      final String productId = product.id.isNotEmpty ? product.id : _productsRef.doc().id;
+      final docRef = _productsRef.doc(productId);
+
+      Product? existingProduct;
+      final existingSnap = await docRef.get();
+      if (existingSnap.exists && existingSnap.data() != null) {
+        existingProduct = Product.fromMap(existingSnap.data()!, productId);
       }
+
+      final finalProduct = product.copyWith(
+        id: productId,
+        createdAt: existingProduct?.createdAt ?? product.createdAt,
+      );
+
+      final batch = _firestore.batch();
+      batch.set(docRef, finalProduct.toMap(), SetOptions(merge: true));
+
+      final oldSku = existingProduct?.sku;
+      final newSku = finalProduct.sku?.trim().isEmpty ?? true ? null : finalProduct.sku!.trim();
+
+      if (oldSku != newSku) {
+        if (oldSku != null && oldSku.isNotEmpty) {
+          batch.delete(_firestore.doc('productSkus/$oldSku'));
+          try {
+            await _firestore.doc('productSkus/$oldSku').delete();
+          } catch (_) {}
+        }
+        if (newSku != null && newSku.isNotEmpty) {
+          batch.set(
+            _firestore.doc('productSkus/$newSku'),
+            <String, dynamic>{
+              'productId': productId,
+              'createdAt': FieldValue.serverTimestamp(),
+            },
+          );
+        }
+      }
+
+      await batch.commit();
     } on FirebaseException catch (e) {
       throw _mapFirebaseException(e);
     } catch (e) {

@@ -12,6 +12,7 @@ import 'package:al_asad_traders/features/people/ui/supplier_detail_screen.dart';
 import 'package:al_asad_traders/features/people/ui/suppliers_screen.dart';
 import 'package:al_asad_traders/features/products/ui/product_detail_screen.dart';
 import 'package:al_asad_traders/features/products/ui/product_list_screen.dart';
+import 'package:al_asad_traders/features/products/ui/scan_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -63,6 +64,12 @@ GoRouter createRouter({
         path: '/setup',
         builder: (BuildContext context, GoRouterState state) {
           return const SetupScreen();
+        },
+      ),
+      GoRoute(
+        path: '/scan',
+        builder: (BuildContext context, GoRouterState state) {
+          return const ScanScreen();
         },
       ),
       StatefulShellRoute.indexedStack(

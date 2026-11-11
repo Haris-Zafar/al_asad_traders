@@ -231,4 +231,28 @@ describe('Security Rules - Owner Auth (T-05)', () => {
       }),
     );
   });
+
+  it('allows owner to create and delete valid productSku and denies update (T-13)', async () => {
+    const ownerDb = testEnv.authenticatedContext('po2rFc75KISIx5DuyyiQhznl3nM2').firestore();
+    const validSku = {
+      productId: 'p1',
+      createdAt: new Date(),
+    };
+    await assertSucceeds(ownerDb.collection('productSkus').doc('1234567890123').set(validSku));
+    // Deny update
+    await assertFails(ownerDb.collection('productSkus').doc('1234567890123').update({ productId: 'p2' }));
+    // Allow delete
+    await assertSucceeds(ownerDb.collection('productSkus').doc('1234567890123').delete());
+  });
+
+  it('denies non-owner to read or write productSkus (T-13)', async () => {
+    const nonOwnerDb = testEnv.authenticatedContext('other-uid').firestore();
+    await assertFails(nonOwnerDb.collection('productSkus').get());
+    await assertFails(
+      nonOwnerDb.collection('productSkus').doc('1234567890123').set({
+        productId: 'p1',
+        createdAt: new Date(),
+      }),
+    );
+  });
 });

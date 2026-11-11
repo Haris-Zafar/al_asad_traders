@@ -69,6 +69,9 @@ abstract final class AppStrings {
   /// Plain term for SKU / barcode.
   static const String barcode = 'Barcode';
 
+  /// Plain term for scan action.
+  static const String scan = 'Scan';
+
   /// Plain term for buyer-specific rate.
   static const String priceForThisBuyer = 'Price for this buyer';
 
@@ -392,6 +395,14 @@ abstract final class AppStrings {
   static const String archiveBankAccountTitle = 'Hide Bank Account';
 
   /// Archive bank account warning message.
-  static const String archiveBankAccountWarning =
-      'Are you sure you want to hide this bank account?';
+  static const String archiveBankAccountWarning = 'Hiding this bank account removes it from future transactions.';
+
+  /// Scan error message prefix.
+  static const String scanError = 'Scan error';
+
+  /// Barcode not found message.
+  static const String noProductWithBarcode = 'No product with this barcode';
+
+  /// Scan again action label.
+  static const String scanAgain = 'Scan again';
 }

@@ -14,9 +14,10 @@ Updated: 2026-11-10
 - T-10 Buyer and supplier management (completed 2026-11-10)
 - T-11 Bank accounts (own, buyers, suppliers) (completed 2026-11-10)
 - T-12 Add and list products (completed 2026-11-10)
+- T-13 Product barcode scanning & lookup (completed 2026-11-10)
 
 ## Now
-- T-13 Product barcode scanning & lookup: ready to start
+- T-14 Product tagging and filtering: ready to start
 
 ## Blocked
 - none
