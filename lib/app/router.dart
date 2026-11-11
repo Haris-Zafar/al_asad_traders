@@ -6,6 +6,10 @@ import 'package:al_asad_traders/features/auth_sync/providers/device_setup_provid
 import 'package:al_asad_traders/features/auth_sync/ui/login_screen.dart';
 import 'package:al_asad_traders/features/auth_sync/ui/setup_screen.dart';
 import 'package:al_asad_traders/features/people/ui/business_profile_screen.dart';
+import 'package:al_asad_traders/features/people/ui/buyer_detail_screen.dart';
+import 'package:al_asad_traders/features/people/ui/buyers_screen.dart';
+import 'package:al_asad_traders/features/people/ui/supplier_detail_screen.dart';
+import 'package:al_asad_traders/features/people/ui/suppliers_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -110,8 +114,18 @@ GoRouter createRouter({
               GoRoute(
                 path: '/buyers',
                 builder: (BuildContext context, GoRouterState state) {
-                  return const BuyersTabScreen();
+                  return const BuyersScreen();
                 },
+                routes: <RouteBase>[
+                  GoRoute(
+                    path: ':id',
+                    builder: (BuildContext context, GoRouterState state) {
+                      return BuyerDetailScreen(
+                        buyerId: state.pathParameters['id']!,
+                      );
+                    },
+                  ),
+                ],
               ),
             ],
           ),
@@ -128,6 +142,22 @@ GoRouter createRouter({
                     builder: (BuildContext context, GoRouterState state) {
                       return const BusinessProfileScreen();
                     },
+                  ),
+                  GoRoute(
+                    path: 'suppliers',
+                    builder: (BuildContext context, GoRouterState state) {
+                      return const SuppliersScreen();
+                    },
+                    routes: <RouteBase>[
+                      GoRoute(
+                        path: ':id',
+                        builder: (BuildContext context, GoRouterState state) {
+                          return SupplierDetailScreen(
+                            supplierId: state.pathParameters['id']!,
+                          );
+                        },
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -207,23 +237,6 @@ class DemandDetailsScreen extends StatelessWidget {
   }
 }
 
-/// Placeholder screen for the Buyers tab.
-class BuyersTabScreen extends StatelessWidget {
-  /// Creates a [BuyersTabScreen].
-  const BuyersTabScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const AppScaffold(
-      title: AppStrings.buyersTab,
-      body: KeyedSubtree(
-        key: Key('buyers_tab_screen'),
-        child: SizedBox.shrink(),
-      ),
-    );
-  }
-}
-
 /// Screen for the More tab.
 /// Rule: docs/UI_PLAN.md > Screens (/more). Story: S11.
 class MoreTabScreen extends StatelessWidget {
@@ -239,6 +252,11 @@ class MoreTabScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
+            AppListRow(
+              key: const Key('more_suppliers_row'),
+              title: AppStrings.suppliersTitle,
+              onTap: () => context.go('/more/suppliers'),
+            ),
             AppListRow(
               key: const Key('more_business_row'),
               title: AppStrings.businessProfileTitle,

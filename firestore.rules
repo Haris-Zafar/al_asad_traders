@@ -5,7 +5,53 @@ service cloud.firestore {
       return request.auth != null && request.auth.uid == 'po2rFc75KISIx5DuyyiQhznl3nM2';
     }
 
-    match /{document=**} {
+    function validBuyer(d) {
+      return d.keys().hasAll(['name', 'contactNumber', 'address', 'notes', 'archivedAt', 'createdAt'])
+        && d.keys().hasOnly(['name', 'contactNumber', 'address', 'notes', 'archivedAt', 'createdAt'])
+        && d.name is string && d.name.size() > 0
+        && (d.contactNumber == null || d.contactNumber is string)
+        && (d.address == null || d.address is string)
+        && (d.notes == null || d.notes is string)
+        && (d.archivedAt == null || d.archivedAt is timestamp)
+        && d.createdAt is timestamp;
+    }
+
+    function validSupplier(d) {
+      return d.keys().hasAll(['name', 'contactNumber', 'address', 'notes', 'archivedAt', 'createdAt'])
+        && d.keys().hasOnly(['name', 'contactNumber', 'address', 'notes', 'archivedAt', 'createdAt'])
+        && d.name is string && d.name.size() > 0
+        && (d.contactNumber == null || d.contactNumber is string)
+        && (d.address == null || d.address is string)
+        && (d.notes == null || d.notes is string)
+        && (d.archivedAt == null || d.archivedAt is timestamp)
+        && d.createdAt is timestamp;
+    }
+
+    match /buyers/{id} {
+      allow read: if owner();
+      allow create, update: if owner() && validBuyer(request.resource.data);
+      allow delete: if false;
+    }
+
+    match /suppliers/{id} {
+      allow read: if owner();
+      allow create, update: if owner() && validSupplier(request.resource.data);
+      allow delete: if false;
+    }
+
+    match /bills/{id} {
+      allow read, write: if owner();
+    }
+
+    match /deviceRegistry/{id} {
+      allow read, write: if owner();
+    }
+
+    match /devices/{id} {
+      allow read, write: if owner();
+    }
+
+    match /profile/{id} {
       allow read, write: if owner();
     }
   }
