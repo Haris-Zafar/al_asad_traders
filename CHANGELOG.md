@@ -3,6 +3,7 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+- Buyer and supplier management screens, form sheets, repositories, and Firestore security rules (T-10).
 - Business profile management screen (`/more/business`) and repository for updating business name, address, and contact numbers.
 - Logout warning dialog when unsynced data exists and persistence cache clearance on logout.
 - Sync state tracking provider and real-time sync status UI chip.

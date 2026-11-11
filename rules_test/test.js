@@ -5,9 +5,13 @@ let testEnv;
 
 describe('Security Rules - Owner Auth (T-05)', () => {
   before(async () => {
+    const hostPort = process.env.FIRESTORE_EMULATOR_HOST || '127.0.0.1:8080';
+    const [host, portStr] = hostPort.split(':');
     testEnv = await initializeTestEnvironment({
       projectId: 'al-asad-traders-test',
       firestore: {
+        host: host || '127.0.0.1',
+        port: parseInt(portStr || '8080', 10),
         rules: fs.readFileSync('../firestore.rules', 'utf8'),
       },
     });
@@ -37,13 +41,13 @@ describe('Security Rules - Owner Auth (T-05)', () => {
   });
 
   it('allows owner authenticated user read and write', async () => {
-    const ownerDb = testEnv.authenticatedContext('OWNER_UID').firestore();
+    const ownerDb = testEnv.authenticatedContext('po2rFc75KISIx5DuyyiQhznl3nM2').firestore();
     await assertSucceeds(ownerDb.collection('bills').get());
     await assertSucceeds(ownerDb.collection('bills').doc('bill-1').set({ status: 'draft' }));
   });
 
   it('allows owner to read and write deviceRegistry and devices (T-06)', async () => {
-    const ownerDb = testEnv.authenticatedContext('OWNER_UID').firestore();
+    const ownerDb = testEnv.authenticatedContext('po2rFc75KISIx5DuyyiQhznl3nM2').firestore();
     await assertSucceeds(ownerDb.collection('deviceRegistry').doc('main').set({ nextIndex: 0 }));
     await assertSucceeds(ownerDb.collection('devices').doc('A').set({ lastNumber: 0 }));
   });
@@ -55,7 +59,7 @@ describe('Security Rules - Owner Auth (T-05)', () => {
   });
 
   it('allows owner to read and write profile main document (T-09)', async () => {
-    const ownerDb = testEnv.authenticatedContext('OWNER_UID').firestore();
+    const ownerDb = testEnv.authenticatedContext('po2rFc75KISIx5DuyyiQhznl3nM2').firestore();
     await assertSucceeds(ownerDb.collection('profile').doc('main').set({ businessName: 'Test' }));
     await assertSucceeds(ownerDb.collection('profile').doc('main').get());
   });
@@ -64,5 +68,41 @@ describe('Security Rules - Owner Auth (T-05)', () => {
     const nonOwnerDb = testEnv.authenticatedContext('other-uid').firestore();
     await assertFails(nonOwnerDb.collection('profile').doc('main').set({ businessName: 'Test' }));
     await assertFails(nonOwnerDb.collection('profile').doc('main').get());
+  });
+
+  it('allows owner to write valid buyer document and denies invalid/delete (T-10)', async () => {
+    const ownerDb = testEnv.authenticatedContext('po2rFc75KISIx5DuyyiQhznl3nM2').firestore();
+    const validBuyer = {
+      name: 'John Buyer',
+      contactNumber: '03001234567',
+      address: 'Main Market',
+      notes: null,
+      archivedAt: null,
+      createdAt: new Date(),
+    };
+    await assertSucceeds(ownerDb.collection('buyers').doc('b1').set(validBuyer));
+    await assertFails(ownerDb.collection('buyers').doc('b1').set({ name: 'Invalid' }));
+    await assertFails(ownerDb.collection('buyers').doc('b1').delete());
+  });
+
+  it('allows owner to write valid supplier document and denies invalid/delete (T-10)', async () => {
+    const ownerDb = testEnv.authenticatedContext('po2rFc75KISIx5DuyyiQhznl3nM2').firestore();
+    const validSupplier = {
+      name: 'ABC Supplier',
+      contactNumber: '03007654321',
+      address: null,
+      notes: 'Reliable',
+      archivedAt: null,
+      createdAt: new Date(),
+    };
+    await assertSucceeds(ownerDb.collection('suppliers').doc('s1').set(validSupplier));
+    await assertFails(ownerDb.collection('suppliers').doc('s1').set({ name: 'Invalid' }));
+    await assertFails(ownerDb.collection('suppliers').doc('s1').delete());
+  });
+
+  it('denies non-owner to read or write buyers and suppliers (T-10)', async () => {
+    const nonOwnerDb = testEnv.authenticatedContext('other-uid').firestore();
+    await assertFails(nonOwnerDb.collection('buyers').get());
+    await assertFails(nonOwnerDb.collection('suppliers').get());
   });
 });
