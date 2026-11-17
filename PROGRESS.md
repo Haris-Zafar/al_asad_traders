@@ -16,12 +16,13 @@ Updated: 2026-11-10
 - T-12 Add and list products (completed 2026-11-10)
 - T-13 Product barcode scanning & lookup (completed 2026-11-10)
 - T-14 Product tagging and filtering (completed 2026-11-10)
+- T-15 Archive products (completed 2026-11-10)
 
 ## Now
-- T-15 Archive products: ready to start
+- T-16 Buyer and supplier rates: ready to start
 
 ## Blocked
 - none
 
 ## Notes for the next chat
-- T-14 completed with Tag and ProductTag models, TagRepository, providers, tag filtering on product list screen, tag assignment in form sheet, security rules, and tests.
+- T-15 completed with ProductRepository archiveProduct/unarchiveProduct, activeProductsProvider, archive warning dialog on ProductDetailScreen, and product archive unit/widget tests.
