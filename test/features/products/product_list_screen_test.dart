@@ -239,7 +239,7 @@ void main() {
         addTearDown(container.dispose);
 
         // Subscribe to activeProductsProvider
-        container.listen(activeProductsProvider, (_, __) {});
+        container.listen(activeProductsProvider, (_, _) {});
         await tester.pump();
 
         final activeList = container.read(activeProductsProvider).value ?? [];
