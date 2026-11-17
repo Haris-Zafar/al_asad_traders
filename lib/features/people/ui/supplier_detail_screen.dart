@@ -6,11 +6,16 @@ import 'package:al_asad_traders/core/widgets/app_dialogs.dart';
 import 'package:al_asad_traders/core/widgets/app_list_row.dart';
 import 'package:al_asad_traders/core/widgets/app_scaffold.dart';
 import 'package:al_asad_traders/core/widgets/loading_view.dart';
+import 'package:al_asad_traders/core/widgets/section_header.dart';
 import 'package:al_asad_traders/features/people/data/suppliers_repository.dart';
 import 'package:al_asad_traders/features/people/models/supplier.dart';
 import 'package:al_asad_traders/features/people/providers/suppliers_provider.dart';
 import 'package:al_asad_traders/features/people/ui/bank_accounts_list_sheet.dart';
 import 'package:al_asad_traders/features/people/ui/supplier_form_sheet.dart';
+import 'package:al_asad_traders/features/prices/providers/rates_provider.dart';
+import 'package:al_asad_traders/features/prices/ui/rate_form_sheet.dart';
+import 'package:al_asad_traders/features/products/models/product.dart';
+import 'package:al_asad_traders/features/products/providers/product_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -133,6 +138,68 @@ class SupplierDetailScreen extends ConsumerWidget {
                       supplierId: supplier.id,
                       ownerName: supplier.name,
                     ),
+                  ),
+                  const SizedBox(height: AppSpacing.l),
+                  SectionHeader(
+                    title: AppStrings.buyingPrice,
+                    actionLabel: AppStrings.addRate,
+                    onActionPressed: () => RateFormSheet.show(
+                      context,
+                      supplierId: supplier.id,
+                    ),
+                  ),
+                  Consumer(
+                    builder: (context, ref, child) {
+                      final supplierRatesAsync = ref.watch(
+                        supplierRatesForSupplierProvider(supplier.id),
+                      );
+                      final productsAsync = ref.watch(productsStreamProvider);
+
+                      final products = productsAsync.value ?? [];
+                      final supplierRates = supplierRatesAsync.value ?? [];
+
+                      if (supplierRates.isEmpty) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: AppSpacing.s,
+                          ),
+                          child: Text(
+                            'No custom rates added yet',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        );
+                      }
+
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: supplierRates.map((rate) {
+                          final product = products.firstWhere(
+                            (p) => p.id == rate.productId,
+                            orElse: () => Product(
+                              id: rate.productId,
+                              name: rate.productId,
+                              defaultSupplierRate: 0,
+                              defaultBuyerRate: 0,
+                              defaultRetailPrice: 0,
+                              createdAt: DateTime.now(),
+                            ),
+                          );
+                          return AppListRow(
+                            key: Key('supplier_rate_row_${rate.id}'),
+                            title: product.name,
+                            subtitle: '${AppStrings.fromDate}: ${rate.effectiveDate}',
+                            trailing: Text(
+                              'Rs ${rate.rate}',
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      );
+                    },
                   ),
                   const SizedBox(height: AppSpacing.xl),
                   ActionRow(

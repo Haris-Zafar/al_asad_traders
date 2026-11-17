@@ -421,4 +421,47 @@ abstract final class AppStrings {
 
   /// Scan again action label.
   static const String scanAgain = 'Scan again';
+
+  /// Add rate button label.
+  static const String addRate = 'Add rate';
+
+  /// Edit rate button label.
+  static const String editRate = 'Edit rate';
+
+  /// Special rates section title.
+  static const String specialRates = 'Special rates';
+
+  /// Buyer rates section/header title.
+  static const String buyerRatesLabel = 'Buyer rates';
+
+  /// Supplier rates section/header title.
+  static const String supplierRatesLabel = 'Supplier rates';
+
+  /// Rate field label.
+  static const String rateLabel = 'Rate';
+
+  /// Effective date field label.
+  static const String effectiveDateLabel = 'Effective date';
+
+  /// Select product action label.
+  static const String selectProduct = 'Select product';
+
+  /// Select buyer action label.
+  static const String selectBuyer = 'Select buyer';
+
+  /// Select supplier action label.
+  static const String selectSupplier = 'Select supplier';
+
+  /// Rate saved confirmation message.
+  static const String rateSaved = 'Rate saved successfully';
+
+  /// Rate type field label.
+  static const String rateTypeLabel = 'Rate type';
+
+  /// Buyer rate option label.
+  static const String buyerRateType = 'Buyer rate';
+
+  /// Supplier rate option label.
+  static const String supplierRateType = 'Supplier rate';
 }
+

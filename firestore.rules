@@ -76,6 +76,26 @@ service cloud.firestore {
         && d.tagId is string && d.tagId.size() > 0;
     }
 
+    function validBuyerRate(d) {
+      return d.keys().hasAll(['buyerId', 'productId', 'rate', 'effectiveDate', 'createdAt'])
+        && d.keys().hasOnly(['buyerId', 'productId', 'rate', 'effectiveDate', 'createdAt'])
+        && d.buyerId is string && d.buyerId.size() > 0
+        && d.productId is string && d.productId.size() > 0
+        && d.rate is int && d.rate >= 0
+        && d.effectiveDate is string && d.effectiveDate.size() > 0
+        && d.createdAt is timestamp;
+    }
+
+    function validSupplierRate(d) {
+      return d.keys().hasAll(['supplierId', 'productId', 'rate', 'effectiveDate', 'createdAt'])
+        && d.keys().hasOnly(['supplierId', 'productId', 'rate', 'effectiveDate', 'createdAt'])
+        && d.supplierId is string && d.supplierId.size() > 0
+        && d.productId is string && d.productId.size() > 0
+        && d.rate is int && d.rate >= 0
+        && d.effectiveDate is string && d.effectiveDate.size() > 0
+        && d.createdAt is timestamp;
+    }
+
     match /buyers/{id} {
       allow read: if owner();
       allow create, update: if owner() && validBuyer(request.resource.data);
@@ -116,6 +136,18 @@ service cloud.firestore {
     match /productTags/{id} {
       allow read: if owner();
       allow create, update: if owner() && validProductTag(request.resource.data) && id == request.resource.data.productId + '_' + request.resource.data.tagId;
+      allow delete: if owner();
+    }
+
+    match /buyerRates/{id} {
+      allow read: if owner();
+      allow create, update: if owner() && validBuyerRate(request.resource.data) && id == request.resource.data.buyerId + '_' + request.resource.data.productId + '_' + request.resource.data.effectiveDate;
+      allow delete: if owner();
+    }
+
+    match /supplierRates/{id} {
+      allow read: if owner();
+      allow create, update: if owner() && validSupplierRate(request.resource.data) && id == request.resource.data.supplierId + '_' + request.resource.data.productId + '_' + request.resource.data.effectiveDate;
       allow delete: if owner();
     }
 
