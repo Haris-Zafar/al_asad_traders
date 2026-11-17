@@ -28,8 +28,7 @@ class ProductDetailScreen extends ConsumerWidget {
   ) async {
     final repository = ref.read(productRepositoryProvider);
     if (product.isArchived) {
-      final updated = product.copyWith(archivedAt: null);
-      await repository.saveProduct(updated);
+      await repository.unarchiveProduct(product.id);
     } else {
       final warnings = await repository.checkArchiveWarnings(product.id);
       if (!context.mounted) return;
@@ -47,8 +46,7 @@ class ProductDetailScreen extends ConsumerWidget {
       );
 
       if (confirmed == true) {
-        final updated = product.copyWith(archivedAt: DateTime.now());
-        await repository.saveProduct(updated);
+        await repository.archiveProduct(product.id);
       }
     }
   }

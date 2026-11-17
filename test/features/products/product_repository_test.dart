@@ -187,5 +187,27 @@ void main() {
         expect(newSkuAfter.exists, isFalse);
       },
     );
+
+    test('archiveProduct sets archivedAt timestamp and unarchiveProduct clears it (S4)', () async {
+      final product = Product(
+        id: 'p-archivable',
+        name: 'Oil 1L',
+        defaultSupplierRate: 200,
+        defaultBuyerRate: 220,
+        defaultRetailPrice: 250,
+        createdAt: DateTime.now(),
+      );
+      await repository.saveProduct(product);
+
+      await repository.archiveProduct('p-archivable');
+      final archivedProduct = await repository.getProduct('p-archivable');
+      expect(archivedProduct?.isArchived, isTrue);
+      expect(archivedProduct?.archivedAt, isNotNull);
+
+      await repository.unarchiveProduct('p-archivable');
+      final unarchivedProduct = await repository.getProduct('p-archivable');
+      expect(unarchivedProduct?.isArchived, isFalse);
+      expect(unarchivedProduct?.archivedAt, isNull);
+    });
   });
 }

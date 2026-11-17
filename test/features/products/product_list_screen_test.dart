@@ -1,6 +1,7 @@
 import 'package:al_asad_traders/features/products/data/product_repository.dart';
 import 'package:al_asad_traders/features/products/data/tag_repository.dart';
 import 'package:al_asad_traders/features/products/models/product.dart';
+import 'package:al_asad_traders/features/products/providers/product_provider.dart';
 import 'package:al_asad_traders/features/products/ui/product_detail_screen.dart';
 import 'package:al_asad_traders/features/products/ui/product_list_screen.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
@@ -178,6 +179,86 @@ void main() {
         expect(find.text('Sugar 1kg'), findsWidgets);
         expect(find.text('12345'), findsOneWidget);
         expect(find.text('Sweet'), findsOneWidget);
+
+        // Tap Archive button ("Hide")
+        await tester.tap(find.byKey(const Key('product_archive_button')));
+        await tester.pumpAndSettle();
+
+        // Confirm dialog should appear
+        expect(find.text('Hide product'), findsOneWidget);
+        expect(find.text('Yes, hide'), findsOneWidget);
+
+        await tester.tap(find.text('Yes, hide'));
+        await tester.pumpAndSettle();
+
+        final archivedProduct = await repo.getProduct('p1');
+        expect(archivedProduct?.isArchived, isTrue);
+
+        // Verify button changes to "Unhide"
+        expect(find.text('Unhide'), findsOneWidget);
+
+        // Tap Unhide button
+        await tester.tap(find.byKey(const Key('product_archive_button')));
+        await tester.pumpAndSettle();
+
+        final unarchivedProduct = await repo.getProduct('p1');
+        expect(unarchivedProduct?.isArchived, isFalse);
+      },
+    );
+
+    testWidgets(
+      'ProductListScreen hides archived products by default and activeProductsProvider excludes them (S4)',
+      (WidgetTester tester) async {
+        final activeProd = Product(
+          id: 'p-active',
+          name: 'Active Product',
+          defaultSupplierRate: 10,
+          defaultBuyerRate: 12,
+          defaultRetailPrice: 15,
+          createdAt: DateTime.now(),
+        );
+        final archivedProd = Product(
+          id: 'p-archived',
+          name: 'Archived Product',
+          defaultSupplierRate: 10,
+          defaultBuyerRate: 12,
+          defaultRetailPrice: 15,
+          archivedAt: DateTime.now(),
+          createdAt: DateTime.now(),
+        );
+
+        await repo.saveProduct(activeProd);
+        await repo.saveProduct(archivedProd);
+
+        final container = ProviderContainer(
+          overrides: [
+            productRepositoryProvider.overrideWithValue(repo),
+            tagRepositoryProvider.overrideWithValue(tagRepo),
+          ],
+        );
+        addTearDown(container.dispose);
+
+        // Subscribe to activeProductsProvider
+        container.listen(activeProductsProvider, (_, _) {});
+        await tester.pump();
+
+        final activeList = container.read(activeProductsProvider).value ?? [];
+        expect(activeList.length, equals(1));
+        expect(activeList.first.id, equals('p-active'));
+
+        // Test UI hiding archived products by default
+        await tester.pumpApp(const ProductListScreen(), container: container);
+        await tester.pumpAndSettle();
+
+        expect(find.text('Active Product'), findsOneWidget);
+        expect(find.text('Archived Product'), findsNothing);
+
+        // Toggle Show Hidden chip
+        await tester.tap(find.byKey(const Key('products_show_archived_chip')));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Active Product'), findsOneWidget);
+        expect(find.text('Archived Product'), findsOneWidget);
       },
     );
   });

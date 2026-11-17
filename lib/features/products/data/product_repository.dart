@@ -167,6 +167,36 @@ class ProductRepository {
     return warnings;
   }
 
+  /// Hides/archives a product by setting [archivedAt].
+  /// Rule: wholesale_project.md > Archiving. Story: S4.
+  Future<void> archiveProduct(String productId) async {
+    try {
+      await _productsRef.doc(productId).update(<String, dynamic>{
+        'archivedAt': Timestamp.fromDate(DateTime.now()),
+      });
+    } on FirebaseException catch (e) {
+      throw _mapFirebaseException(e);
+    } catch (e) {
+      if (e is AppException) rethrow;
+      throw UnknownException(AppStrings.errorGeneric, e);
+    }
+  }
+
+  /// Unhides/unarchives a product by clearing [archivedAt].
+  /// Rule: wholesale_project.md > Archiving. Story: S4.
+  Future<void> unarchiveProduct(String productId) async {
+    try {
+      await _productsRef.doc(productId).update(<String, dynamic>{
+        'archivedAt': null,
+      });
+    } on FirebaseException catch (e) {
+      throw _mapFirebaseException(e);
+    } catch (e) {
+      if (e is AppException) rethrow;
+      throw UnknownException(AppStrings.errorGeneric, e);
+    }
+  }
+
   AppException _mapFirebaseException(FirebaseException e) {
     switch (e.code) {
       case 'permission-denied':
