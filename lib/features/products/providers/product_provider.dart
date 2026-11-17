@@ -154,3 +154,12 @@ filteredProductsProvider = Provider<AsyncValue<List<Product>>>((ref) {
 
   return AsyncValue.data(filtered);
 });
+
+/// Stream/Provider for watching active (non-archived) products for pickers.
+/// Rule: docs/UI_PLAN.md > Interaction rules. Story: S4.
+final activeProductsProvider = Provider<AsyncValue<List<Product>>>((ref) {
+  final productsAsync = ref.watch(productsStreamProvider);
+  return productsAsync.whenData((products) {
+    return products.where((product) => !product.isArchived).toList();
+  });
+});
