@@ -96,6 +96,15 @@ service cloud.firestore {
         && d.createdAt is timestamp;
     }
 
+    function validRetailPrice(d) {
+      return d.keys().hasAll(['productId', 'price', 'effectiveDate', 'createdAt'])
+        && d.keys().hasOnly(['productId', 'price', 'effectiveDate', 'createdAt'])
+        && d.productId is string && d.productId.size() > 0
+        && d.price is int && d.price >= 0
+        && d.effectiveDate is string && d.effectiveDate.size() > 0
+        && d.createdAt is timestamp;
+    }
+
     match /buyers/{id} {
       allow read: if owner();
       allow create, update: if owner() && validBuyer(request.resource.data);
@@ -148,6 +157,12 @@ service cloud.firestore {
     match /supplierRates/{id} {
       allow read: if owner();
       allow create, update: if owner() && validSupplierRate(request.resource.data) && id == request.resource.data.supplierId + '_' + request.resource.data.productId + '_' + request.resource.data.effectiveDate;
+      allow delete: if owner();
+    }
+
+    match /retailPrices/{id} {
+      allow read: if owner();
+      allow create, update: if owner() && validRetailPrice(request.resource.data) && id == request.resource.data.productId + '_' + request.resource.data.effectiveDate;
       allow delete: if owner();
     }
 

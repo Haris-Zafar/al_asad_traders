@@ -339,5 +339,23 @@ describe('Security Rules - Owner Auth (T-05)', () => {
     await assertFails(nonOwnerDb.collection('buyerRates').doc(buyerRateDocId).set(validBuyerRate));
     await assertFails(nonOwnerDb.collection('supplierRates').get());
     await assertFails(nonOwnerDb.collection('supplierRates').doc(supplierRateDocId).set(validSupplierRate));
+
+    // Retail price
+    const validRetailPrice = {
+      productId: 'p1',
+      price: 160,
+      effectiveDate: '2026-11-10',
+      createdAt: new Date(),
+    };
+    const retailPriceDocId = 'p1_2026-11-10';
+
+    await assertSucceeds(ownerDb.collection('retailPrices').doc(retailPriceDocId).set(validRetailPrice));
+    await assertSucceeds(ownerDb.collection('retailPrices').doc(retailPriceDocId).get());
+    await assertSucceeds(ownerDb.collection('retailPrices').doc(retailPriceDocId).set({ ...validRetailPrice, price: 175 }));
+    await assertFails(ownerDb.collection('retailPrices').doc('wrong_doc_id').set(validRetailPrice));
+    await assertFails(ownerDb.collection('retailPrices').doc(retailPriceDocId).set({ ...validRetailPrice, price: -5 }));
+
+    await assertFails(nonOwnerDb.collection('retailPrices').get());
+    await assertFails(nonOwnerDb.collection('retailPrices').doc(retailPriceDocId).set(validRetailPrice));
   });
 });

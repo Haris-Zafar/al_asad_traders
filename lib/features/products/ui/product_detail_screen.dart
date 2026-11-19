@@ -181,6 +181,9 @@ class ProductDetailScreen extends ConsumerWidget {
                       final supplierRatesAsync = ref.watch(
                         supplierRatesForProductProvider(productId),
                       );
+                      final retailPricesAsync = ref.watch(
+                        retailPricesForProductProvider(productId),
+                      );
                       final buyersAsync = ref.watch(buyersStreamProvider);
                       final suppliersAsync = ref.watch(suppliersStreamProvider);
 
@@ -188,8 +191,11 @@ class ProductDetailScreen extends ConsumerWidget {
                       final suppliers = suppliersAsync.value ?? [];
                       final buyerRates = buyerRatesAsync.value ?? [];
                       final supplierRates = supplierRatesAsync.value ?? [];
+                      final retailPrices = retailPricesAsync.value ?? [];
 
-                      if (buyerRates.isEmpty && supplierRates.isEmpty) {
+                      if (buyerRates.isEmpty &&
+                          supplierRates.isEmpty &&
+                          retailPrices.isEmpty) {
                         return Padding(
                           padding: const EdgeInsets.symmetric(
                             vertical: AppSpacing.s,
@@ -246,6 +252,22 @@ class ProductDetailScreen extends ConsumerWidget {
                                   '${AppStrings.fromDate}: ${rate.effectiveDate}',
                               trailing: Text(
                                 'Rs ${rate.rate}',
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            );
+                          }),
+                          ...retailPrices.map((retail) {
+                            return AppListRow(
+                              key: Key(
+                                'product_retail_price_rate_${retail.id}',
+                              ),
+                              title:
+                                  '${AppStrings.shopPrice} (${AppStrings.fromDate}: ${retail.effectiveDate})',
+                              subtitle: '',
+                              trailing: Text(
+                                'Rs ${retail.price}',
                                 style: theme.textTheme.titleMedium?.copyWith(
                                   fontWeight: FontWeight.bold,
                                 ),

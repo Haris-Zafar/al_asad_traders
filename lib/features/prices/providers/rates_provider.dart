@@ -1,5 +1,6 @@
 import 'package:al_asad_traders/features/prices/data/rates_repository.dart';
 import 'package:al_asad_traders/features/prices/models/buyer_rate.dart';
+import 'package:al_asad_traders/features/prices/models/retail_price.dart';
 import 'package:al_asad_traders/features/prices/models/supplier_rate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -33,4 +34,12 @@ final supplierRatesForProductProvider = StreamProvider.autoDispose
     .family<List<SupplierRate>, String>((ref, productId) {
       final repository = ref.watch(ratesRepositoryProvider);
       return repository.watchSupplierRatesForProduct(productId);
+    });
+
+/// Stream provider for retail prices of a specific product.
+/// Rule: docs/ARCHITECTURE.md > State pattern. Story: S6.
+final retailPricesForProductProvider = StreamProvider.autoDispose
+    .family<List<RetailPrice>, String>((ref, productId) {
+      final repository = ref.watch(ratesRepositoryProvider);
+      return repository.watchRetailPricesForProduct(productId);
     });

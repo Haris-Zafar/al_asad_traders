@@ -3,6 +3,7 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+- Retail price history model, repository with same-day replacement, UI form sheet, and security rules (T-17).
 - Buyer and supplier specific rates management with effective dates and same-day overwrite (T-16).
 - Product soft-delete archiving and unarchiving with warning dialogs and active picker filtering (T-15).
 - Product tagging and tag filtering for product list and product details (T-14).
