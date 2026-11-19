@@ -19,12 +19,13 @@ Updated: 2026-11-10
 - T-15 Archive products (completed 2026-11-10)
 - T-16 Buyer and supplier rates (completed 2026-11-10)
 - T-17 Retail price history (completed 2026-11-10)
+- T-18 Price resolution rule (completed 2026-11-10)
 
 ## Now
-- T-18 Price resolution rule: ready to start
+- T-19 Record buyer demand & items: in progress, feature/T-18-price-rule
 
 ## Blocked
 - none
 
 ## Notes for the next chat
-- T-17 completed with RetailPrice model, RatesRepository extensions (same-day overwrite), RateFormSheet retail support, ProductDetailScreen integration, Firestore security rules, and unit/widget/rules tests.
+- T-18 completed with PriceResolutionRules pure logic (effectiveDate <= D, falling back to product defaults) and Riverpod stream providers (resolvedBuyerPriceProvider, resolvedSupplierPriceProvider, resolvedRetailPriceProvider), with unit tests.
