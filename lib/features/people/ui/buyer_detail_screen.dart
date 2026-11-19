@@ -150,10 +150,8 @@ class BuyerDetailScreen extends ConsumerWidget {
                   SectionHeader(
                     title: AppStrings.priceForThisBuyer,
                     actionLabel: AppStrings.addRate,
-                    onActionPressed: () => RateFormSheet.show(
-                      context,
-                      buyerId: buyer.id,
-                    ),
+                    onAction: () =>
+                        RateFormSheet.show(context, buyerId: buyer.id),
                   ),
                   Consumer(
                     builder: (context, ref, child) {
@@ -196,7 +194,8 @@ class BuyerDetailScreen extends ConsumerWidget {
                           return AppListRow(
                             key: Key('buyer_rate_row_${rate.id}'),
                             title: product.name,
-                            subtitle: '${AppStrings.fromDate}: ${rate.effectiveDate}',
+                            subtitle:
+                                '${AppStrings.fromDate}: ${rate.effectiveDate}',
                             trailing: Text(
                               'Rs ${rate.rate}',
                               style: theme.textTheme.titleMedium?.copyWith(

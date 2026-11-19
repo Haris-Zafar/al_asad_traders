@@ -464,4 +464,3 @@ abstract final class AppStrings {
   /// Supplier rate option label.
   static const String supplierRateType = 'Supplier rate';
 }
-

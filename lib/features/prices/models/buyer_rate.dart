@@ -38,8 +38,7 @@ class BuyerRate {
     String buyerId,
     String productId,
     String effectiveDate,
-  ) =>
-      '${buyerId}_${productId}_$effectiveDate';
+  ) => '${buyerId}_${productId}_$effectiveDate';
 
   /// Creates a [BuyerRate] instance from a Firestore document snapshot.
   factory BuyerRate.fromDocument(DocumentSnapshot<Map<String, dynamic>> doc) {
@@ -53,8 +52,8 @@ class BuyerRate {
     final DateTime createdAtDate = createdAtRaw is Timestamp
         ? createdAtRaw.toDate()
         : createdAtRaw is DateTime
-            ? createdAtRaw
-            : DateTime.now();
+        ? createdAtRaw
+        : DateTime.now();
 
     return BuyerRate(
       id: id,

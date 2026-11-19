@@ -60,14 +60,13 @@ class RateFormSheet extends ConsumerStatefulWidget {
     return showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      builder:
-          (context) => RateFormSheet(
-            buyerId: buyerId,
-            supplierId: supplierId,
-            productId: productId,
-            existingBuyerRate: existingBuyerRate,
-            existingSupplierRate: existingSupplierRate,
-          ),
+      builder: (context) => RateFormSheet(
+        buyerId: buyerId,
+        supplierId: supplierId,
+        productId: productId,
+        existingBuyerRate: existingBuyerRate,
+        existingSupplierRate: existingSupplierRate,
+      ),
     );
   }
 
@@ -115,8 +114,7 @@ class _RateFormSheetState extends ConsumerState<RateFormSheet> {
         widget.existingBuyerRate?.effectiveDate ??
         widget.existingSupplierRate?.effectiveDate;
     if (initialDateStr != null && initialDateStr.isNotEmpty) {
-      _effectiveDate =
-          DateTime.tryParse(initialDateStr) ?? DateTime.now();
+      _effectiveDate = DateTime.tryParse(initialDateStr) ?? DateTime.now();
     } else {
       _effectiveDate = DateTime.now();
     }
@@ -153,15 +151,14 @@ class _RateFormSheetState extends ConsumerState<RateFormSheet> {
     final selected = await showModalBottomSheet<Buyer>(
       context: context,
       isScrollControlled: true,
-      builder:
-          (context) => PickerSheet<Buyer>(
-            title: AppStrings.selectBuyer,
-            searchHint: AppStrings.searchBuyers,
-            items: buyers,
-            itemTitle: (buyer) => buyer.name,
-            itemSubtitle: (buyer) => buyer.contactNumber,
-            onSelected: (buyer) => Navigator.pop(context, buyer),
-          ),
+      builder: (context) => PickerSheet<Buyer>(
+        title: AppStrings.selectBuyer,
+        searchHint: AppStrings.searchBuyers,
+        items: buyers,
+        itemTitle: (buyer) => buyer.name,
+        itemSubtitle: (buyer) => buyer.contactNumber,
+        onSelected: (buyer) => Navigator.pop(context, buyer),
+      ),
     );
     if (selected != null) {
       setState(() {
@@ -174,15 +171,14 @@ class _RateFormSheetState extends ConsumerState<RateFormSheet> {
     final selected = await showModalBottomSheet<Supplier>(
       context: context,
       isScrollControlled: true,
-      builder:
-          (context) => PickerSheet<Supplier>(
-            title: AppStrings.selectSupplier,
-            searchHint: AppStrings.searchSuppliers,
-            items: suppliers,
-            itemTitle: (supplier) => supplier.name,
-            itemSubtitle: (supplier) => supplier.contactNumber,
-            onSelected: (supplier) => Navigator.pop(context, supplier),
-          ),
+      builder: (context) => PickerSheet<Supplier>(
+        title: AppStrings.selectSupplier,
+        searchHint: AppStrings.searchSuppliers,
+        items: suppliers,
+        itemTitle: (supplier) => supplier.name,
+        itemSubtitle: (supplier) => supplier.contactNumber,
+        onSelected: (supplier) => Navigator.pop(context, supplier),
+      ),
     );
     if (selected != null) {
       setState(() {
@@ -195,15 +191,14 @@ class _RateFormSheetState extends ConsumerState<RateFormSheet> {
     final selected = await showModalBottomSheet<Product>(
       context: context,
       isScrollControlled: true,
-      builder:
-          (context) => PickerSheet<Product>(
-            title: AppStrings.selectProduct,
-            searchHint: AppStrings.searchProducts,
-            items: products,
-            itemTitle: (product) => product.name,
-            itemSubtitle: (product) => 'Rs ${product.defaultBuyerRate}',
-            onSelected: (product) => Navigator.pop(context, product),
-          ),
+      builder: (context) => PickerSheet<Product>(
+        title: AppStrings.selectProduct,
+        searchHint: AppStrings.searchProducts,
+        items: products,
+        itemTitle: (product) => product.name,
+        itemSubtitle: (product) => 'Rs ${product.defaultBuyerRate}',
+        onSelected: (product) => Navigator.pop(context, product),
+      ),
     );
     if (selected != null) {
       setState(() {
@@ -221,7 +216,7 @@ class _RateFormSheetState extends ConsumerState<RateFormSheet> {
     final rateInt = int.tryParse(rateText);
     if (rateInt == null || rateInt < 0) {
       setState(() {
-        _errorText = AppStrings.invalidInput;
+        _errorText = AppStrings.errorValidation;
       });
       return;
     }
@@ -305,15 +300,17 @@ class _RateFormSheetState extends ConsumerState<RateFormSheet> {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final buyersAsync = ref.watch(buyersStreamProvider);
     final suppliersAsync = ref.watch(suppliersStreamProvider);
     final productsAsync = ref.watch(activeProductsProvider);
 
-    final buyers =
-        (buyersAsync.value ?? []).where((b) => !b.isArchived).toList();
-    final suppliers =
-        (suppliersAsync.value ?? []).where((s) => !s.isArchived).toList();
+    final buyers = (buyersAsync.value ?? [])
+        .where((b) => !b.isArchived)
+        .toList();
+    final suppliers = (suppliersAsync.value ?? [])
+        .where((s) => !s.isArchived)
+        .toList();
     final products = productsAsync.value ?? [];
 
     final selectedBuyer = buyers.cast<Buyer?>().firstWhere(
@@ -333,9 +330,8 @@ class _RateFormSheetState extends ConsumerState<RateFormSheet> {
     final isFixedBuyer = widget.buyerId != null;
     final isFixedSupplier = widget.supplierId != null;
 
-    final formattedDateDisplay = DateFormat(
-      'd MMM yyyy',
-    ).format(_effectiveDate);
+    final formattedDateDisplay = DateFormat('d MMM yyyy')
+        .format(_effectiveDate);
 
     return AppSheet(
       title: AppStrings.addRate,

@@ -9,6 +9,8 @@ import 'package:al_asad_traders/features/people/models/supplier.dart';
 import 'package:al_asad_traders/features/people/ui/business_profile_screen.dart';
 import 'package:al_asad_traders/features/people/ui/buyer_detail_screen.dart';
 import 'package:al_asad_traders/features/people/ui/supplier_detail_screen.dart';
+import 'package:al_asad_traders/features/prices/data/rates_repository.dart';
+import 'package:al_asad_traders/features/products/providers/product_provider.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -23,6 +25,7 @@ void main() {
     late BuyersRepository buyersRepo;
     late SuppliersRepository suppliersRepo;
     late ProfileRepository profileRepo;
+    late RatesRepository ratesRepo;
 
     setUp(() {
       firestore = FakeFirebaseFirestore();
@@ -30,6 +33,7 @@ void main() {
       buyersRepo = BuyersRepository(firestore);
       suppliersRepo = SuppliersRepository(firestore);
       profileRepo = ProfileRepository(firestore);
+      ratesRepo = RatesRepository(firestore);
     });
 
     testWidgets(
@@ -46,6 +50,8 @@ void main() {
           overrides: [
             bankAccountsRepositoryProvider.overrideWithValue(bankRepo),
             buyersRepositoryProvider.overrideWithValue(buyersRepo),
+            ratesRepositoryProvider.overrideWithValue(ratesRepo),
+            productsStreamProvider.overrideWith((ref) => Stream.value([])),
           ],
         );
 
@@ -120,6 +126,8 @@ void main() {
         overrides: [
           bankAccountsRepositoryProvider.overrideWithValue(bankRepo),
           suppliersRepositoryProvider.overrideWithValue(suppliersRepo),
+          ratesRepositoryProvider.overrideWithValue(ratesRepo),
+          productsStreamProvider.overrideWith((ref) => Stream.value([])),
         ],
       );
 

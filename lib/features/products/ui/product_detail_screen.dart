@@ -6,6 +6,8 @@ import 'package:al_asad_traders/core/widgets/app_dialogs.dart';
 import 'package:al_asad_traders/core/widgets/app_list_row.dart';
 import 'package:al_asad_traders/core/widgets/app_scaffold.dart';
 import 'package:al_asad_traders/core/widgets/section_header.dart';
+import 'package:al_asad_traders/features/people/models/buyer.dart';
+import 'package:al_asad_traders/features/people/models/supplier.dart';
 import 'package:al_asad_traders/features/people/providers/buyers_provider.dart';
 import 'package:al_asad_traders/features/people/providers/suppliers_provider.dart';
 import 'package:al_asad_traders/features/prices/providers/rates_provider.dart';
@@ -168,10 +170,8 @@ class ProductDetailScreen extends ConsumerWidget {
                   SectionHeader(
                     title: AppStrings.specialRates,
                     actionLabel: AppStrings.addRate,
-                    onActionPressed: () => RateFormSheet.show(
-                      context,
-                      productId: product.id,
-                    ),
+                    onAction: () =>
+                        RateFormSheet.show(context, productId: product.id),
                   ),
                   Consumer(
                     builder: (context, ref, child) {
@@ -217,8 +217,10 @@ class ProductDetailScreen extends ConsumerWidget {
                             );
                             return AppListRow(
                               key: Key('product_buyer_rate_${rate.id}'),
-                              title: '${buyer.name} (${AppStrings.buyerRateType})',
-                              subtitle: '${AppStrings.fromDate}: ${rate.effectiveDate}',
+                              title:
+                                  '${buyer.name} (${AppStrings.buyerRateType})',
+                              subtitle:
+                                  '${AppStrings.fromDate}: ${rate.effectiveDate}',
                               trailing: Text(
                                 'Rs ${rate.rate}',
                                 style: theme.textTheme.titleMedium?.copyWith(
@@ -238,8 +240,10 @@ class ProductDetailScreen extends ConsumerWidget {
                             );
                             return AppListRow(
                               key: Key('product_supplier_rate_${rate.id}'),
-                              title: '${supplier.name} (${AppStrings.supplierRateType})',
-                              subtitle: '${AppStrings.fromDate}: ${rate.effectiveDate}',
+                              title:
+                                  '${supplier.name} (${AppStrings.supplierRateType})',
+                              subtitle:
+                                  '${AppStrings.fromDate}: ${rate.effectiveDate}',
                               trailing: Text(
                                 'Rs ${rate.rate}',
                                 style: theme.textTheme.titleMedium?.copyWith(

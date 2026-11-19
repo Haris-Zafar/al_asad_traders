@@ -1,3 +1,6 @@
+import 'package:al_asad_traders/features/people/providers/buyers_provider.dart';
+import 'package:al_asad_traders/features/people/providers/suppliers_provider.dart';
+import 'package:al_asad_traders/features/prices/data/rates_repository.dart';
 import 'package:al_asad_traders/features/products/data/product_repository.dart';
 import 'package:al_asad_traders/features/products/data/tag_repository.dart';
 import 'package:al_asad_traders/features/products/models/product.dart';
@@ -16,11 +19,13 @@ void main() {
     late FakeFirebaseFirestore firestore;
     late ProductRepository repo;
     late TagRepository tagRepo;
+    late RatesRepository ratesRepo;
 
     setUp(() {
       firestore = FakeFirebaseFirestore();
       repo = ProductRepository(firestore);
       tagRepo = TagRepository(firestore);
+      ratesRepo = RatesRepository(firestore);
     });
 
     testWidgets(
@@ -167,6 +172,9 @@ void main() {
           overrides: [
             productRepositoryProvider.overrideWithValue(repo),
             tagRepositoryProvider.overrideWithValue(tagRepo),
+            ratesRepositoryProvider.overrideWithValue(ratesRepo),
+            buyersStreamProvider.overrideWith((ref) => Stream.value([])),
+            suppliersStreamProvider.overrideWith((ref) => Stream.value([])),
           ],
         );
 
@@ -181,6 +189,9 @@ void main() {
         expect(find.text('Sweet'), findsOneWidget);
 
         // Tap Archive button ("Hide")
+        await tester.ensureVisible(
+          find.byKey(const Key('product_archive_button')),
+        );
         await tester.tap(find.byKey(const Key('product_archive_button')));
         await tester.pumpAndSettle();
 

@@ -38,7 +38,7 @@ class RatesRepository {
       final rateWithId = rate.copyWith(id: docId);
       await _buyerRatesRef.doc(docId).set(rateWithId.toMap());
     } catch (e) {
-      throw AppException(AppStrings.somethingWentWrong);
+      throw UnknownException(AppStrings.errorGeneric, e);
     }
   }
 
@@ -54,22 +54,22 @@ class RatesRepository {
       final rateWithId = rate.copyWith(id: docId);
       await _supplierRatesRef.doc(docId).set(rateWithId.toMap());
     } catch (e) {
-      throw AppException(AppStrings.somethingWentWrong);
+      throw UnknownException(AppStrings.errorGeneric, e);
     }
   }
 
   /// Stream of buyer rates for a specific buyer, sorted newest effective date first.
   /// Rule: docs/DATABASE.md > Key queries. Story: S5.
   Stream<List<BuyerRate>> watchBuyerRatesForBuyer(String buyerId) {
-    return _buyerRatesRef
-        .where('buyerId', isEqualTo: buyerId)
-        .snapshots()
-        .map((snapshot) {
-          final list =
-              snapshot.docs.map((doc) => BuyerRate.fromDocument(doc)).toList();
-          list.sort((a, b) => b.effectiveDate.compareTo(a.effectiveDate));
-          return list;
-        });
+    return _buyerRatesRef.where('buyerId', isEqualTo: buyerId).snapshots().map((
+      snapshot,
+    ) {
+      final list = snapshot.docs
+          .map((doc) => BuyerRate.fromDocument(doc))
+          .toList();
+      list.sort((a, b) => b.effectiveDate.compareTo(a.effectiveDate));
+      return list;
+    });
   }
 
   /// Stream of buyer rates for a specific product, sorted newest effective date first.
@@ -79,8 +79,9 @@ class RatesRepository {
         .where('productId', isEqualTo: productId)
         .snapshots()
         .map((snapshot) {
-          final list =
-              snapshot.docs.map((doc) => BuyerRate.fromDocument(doc)).toList();
+          final list = snapshot.docs
+              .map((doc) => BuyerRate.fromDocument(doc))
+              .toList();
           list.sort((a, b) => b.effectiveDate.compareTo(a.effectiveDate));
           return list;
         });
@@ -93,10 +94,9 @@ class RatesRepository {
         .where('supplierId', isEqualTo: supplierId)
         .snapshots()
         .map((snapshot) {
-          final list =
-              snapshot.docs
-                  .map((doc) => SupplierRate.fromDocument(doc))
-                  .toList();
+          final list = snapshot.docs
+              .map((doc) => SupplierRate.fromDocument(doc))
+              .toList();
           list.sort((a, b) => b.effectiveDate.compareTo(a.effectiveDate));
           return list;
         });
@@ -109,10 +109,9 @@ class RatesRepository {
         .where('productId', isEqualTo: productId)
         .snapshots()
         .map((snapshot) {
-          final list =
-              snapshot.docs
-                  .map((doc) => SupplierRate.fromDocument(doc))
-                  .toList();
+          final list = snapshot.docs
+              .map((doc) => SupplierRate.fromDocument(doc))
+              .toList();
           list.sort((a, b) => b.effectiveDate.compareTo(a.effectiveDate));
           return list;
         });
@@ -124,7 +123,7 @@ class RatesRepository {
     try {
       await _buyerRatesRef.doc(id).delete();
     } catch (e) {
-      throw AppException(AppStrings.somethingWentWrong);
+      throw UnknownException(AppStrings.errorGeneric, e);
     }
   }
 
@@ -134,7 +133,7 @@ class RatesRepository {
     try {
       await _supplierRatesRef.doc(id).delete();
     } catch (e) {
-      throw AppException(AppStrings.somethingWentWrong);
+      throw UnknownException(AppStrings.errorGeneric, e);
     }
   }
 }

@@ -2,6 +2,8 @@ import 'package:al_asad_traders/features/people/data/buyers_repository.dart';
 import 'package:al_asad_traders/features/people/models/buyer.dart';
 import 'package:al_asad_traders/features/people/ui/buyer_detail_screen.dart';
 import 'package:al_asad_traders/features/people/ui/buyers_screen.dart';
+import 'package:al_asad_traders/features/prices/data/rates_repository.dart';
+import 'package:al_asad_traders/features/products/providers/product_provider.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,10 +15,12 @@ void main() {
   group('BuyersScreen & BuyerDetailScreen (S9)', () {
     late FakeFirebaseFirestore firestore;
     late BuyersRepository repo;
+    late RatesRepository ratesRepo;
 
     setUp(() {
       firestore = FakeFirebaseFirestore();
       repo = BuyersRepository(firestore);
+      ratesRepo = RatesRepository(firestore);
     });
 
     testWidgets(
@@ -88,7 +92,11 @@ void main() {
         await repo.saveBuyer(buyer);
 
         final container = ProviderContainer(
-          overrides: [buyersRepositoryProvider.overrideWithValue(repo)],
+          overrides: [
+            buyersRepositoryProvider.overrideWithValue(repo),
+            ratesRepositoryProvider.overrideWithValue(ratesRepo),
+            productsStreamProvider.overrideWith((ref) => Stream.value([])),
+          ],
         );
 
         await tester.pumpApp(

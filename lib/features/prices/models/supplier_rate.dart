@@ -38,8 +38,7 @@ class SupplierRate {
     String supplierId,
     String productId,
     String effectiveDate,
-  ) =>
-      '${supplierId}_${productId}_$effectiveDate';
+  ) => '${supplierId}_${productId}_$effectiveDate';
 
   /// Creates a [SupplierRate] instance from a Firestore document snapshot.
   factory SupplierRate.fromDocument(
@@ -55,8 +54,8 @@ class SupplierRate {
     final DateTime createdAtDate = createdAtRaw is Timestamp
         ? createdAtRaw.toDate()
         : createdAtRaw is DateTime
-            ? createdAtRaw
-            : DateTime.now();
+        ? createdAtRaw
+        : DateTime.now();
 
     return SupplierRate(
       id: id,
