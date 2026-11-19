@@ -2,6 +2,8 @@ import 'package:al_asad_traders/features/people/data/suppliers_repository.dart';
 import 'package:al_asad_traders/features/people/models/supplier.dart';
 import 'package:al_asad_traders/features/people/ui/supplier_detail_screen.dart';
 import 'package:al_asad_traders/features/people/ui/suppliers_screen.dart';
+import 'package:al_asad_traders/features/prices/data/rates_repository.dart';
+import 'package:al_asad_traders/features/products/providers/product_provider.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,10 +15,12 @@ void main() {
   group('SuppliersScreen & SupplierDetailScreen (S9)', () {
     late FakeFirebaseFirestore firestore;
     late SuppliersRepository repo;
+    late RatesRepository ratesRepo;
 
     setUp(() {
       firestore = FakeFirebaseFirestore();
       repo = SuppliersRepository(firestore);
+      ratesRepo = RatesRepository(firestore);
     });
 
     testWidgets(
@@ -88,7 +92,11 @@ void main() {
         await repo.saveSupplier(supplier);
 
         final container = ProviderContainer(
-          overrides: [suppliersRepositoryProvider.overrideWithValue(repo)],
+          overrides: [
+            suppliersRepositoryProvider.overrideWithValue(repo),
+            ratesRepositoryProvider.overrideWithValue(ratesRepo),
+            productsStreamProvider.overrideWith((ref) => Stream.value([])),
+          ],
         );
 
         await tester.pumpApp(

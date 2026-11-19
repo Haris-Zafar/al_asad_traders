@@ -5,6 +5,13 @@ import 'package:al_asad_traders/core/widgets/app_button.dart';
 import 'package:al_asad_traders/core/widgets/app_dialogs.dart';
 import 'package:al_asad_traders/core/widgets/app_list_row.dart';
 import 'package:al_asad_traders/core/widgets/app_scaffold.dart';
+import 'package:al_asad_traders/core/widgets/section_header.dart';
+import 'package:al_asad_traders/features/people/models/buyer.dart';
+import 'package:al_asad_traders/features/people/models/supplier.dart';
+import 'package:al_asad_traders/features/people/providers/buyers_provider.dart';
+import 'package:al_asad_traders/features/people/providers/suppliers_provider.dart';
+import 'package:al_asad_traders/features/prices/providers/rates_provider.dart';
+import 'package:al_asad_traders/features/prices/ui/rate_form_sheet.dart';
 import 'package:al_asad_traders/features/products/data/product_repository.dart';
 import 'package:al_asad_traders/features/products/models/product.dart';
 import 'package:al_asad_traders/features/products/providers/product_provider.dart';
@@ -159,6 +166,96 @@ class ProductDetailScreen extends ConsumerWidget {
                       title: AppStrings.notesLabel,
                       subtitle: product.notes,
                     ),
+                  const SizedBox(height: AppSpacing.l),
+                  SectionHeader(
+                    title: AppStrings.specialRates,
+                    actionLabel: AppStrings.addRate,
+                    onAction: () =>
+                        RateFormSheet.show(context, productId: product.id),
+                  ),
+                  Consumer(
+                    builder: (context, ref, child) {
+                      final buyerRatesAsync = ref.watch(
+                        buyerRatesForProductProvider(productId),
+                      );
+                      final supplierRatesAsync = ref.watch(
+                        supplierRatesForProductProvider(productId),
+                      );
+                      final buyersAsync = ref.watch(buyersStreamProvider);
+                      final suppliersAsync = ref.watch(suppliersStreamProvider);
+
+                      final buyers = buyersAsync.value ?? [];
+                      final suppliers = suppliersAsync.value ?? [];
+                      final buyerRates = buyerRatesAsync.value ?? [];
+                      final supplierRates = supplierRatesAsync.value ?? [];
+
+                      if (buyerRates.isEmpty && supplierRates.isEmpty) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: AppSpacing.s,
+                          ),
+                          child: Text(
+                            'No custom rates added yet',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        );
+                      }
+
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          ...buyerRates.map((rate) {
+                            final buyer = buyers.firstWhere(
+                              (b) => b.id == rate.buyerId,
+                              orElse: () => Buyer(
+                                id: rate.buyerId,
+                                name: rate.buyerId,
+                                createdAt: DateTime.now(),
+                              ),
+                            );
+                            return AppListRow(
+                              key: Key('product_buyer_rate_${rate.id}'),
+                              title:
+                                  '${buyer.name} (${AppStrings.buyerRateType})',
+                              subtitle:
+                                  '${AppStrings.fromDate}: ${rate.effectiveDate}',
+                              trailing: Text(
+                                'Rs ${rate.rate}',
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            );
+                          }),
+                          ...supplierRates.map((rate) {
+                            final supplier = suppliers.firstWhere(
+                              (s) => s.id == rate.supplierId,
+                              orElse: () => Supplier(
+                                id: rate.supplierId,
+                                name: rate.supplierId,
+                                createdAt: DateTime.now(),
+                              ),
+                            );
+                            return AppListRow(
+                              key: Key('product_supplier_rate_${rate.id}'),
+                              title:
+                                  '${supplier.name} (${AppStrings.supplierRateType})',
+                              subtitle:
+                                  '${AppStrings.fromDate}: ${rate.effectiveDate}',
+                              trailing: Text(
+                                'Rs ${rate.rate}',
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            );
+                          }),
+                        ],
+                      );
+                    },
+                  ),
                   const SizedBox(height: AppSpacing.xl),
                   ActionRow(
                     primary: AppButton(

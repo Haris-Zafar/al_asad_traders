@@ -294,4 +294,50 @@ describe('Security Rules - Owner Auth (T-05)', () => {
     await assertFails(nonOwnerDb.collection('productTags').get());
     await assertFails(nonOwnerDb.collection('productTags').doc('p1_spices').set(validProductTag));
   });
+
+  it('allows owner to manage valid buyerRates and supplierRates with composite doc ID (T-16)', async () => {
+    const ownerDb = testEnv.authenticatedContext('po2rFc75KISIx5DuyyiQhznl3nM2').firestore();
+    const validBuyerRate = {
+      buyerId: 'b1',
+      productId: 'p1',
+      rate: 150,
+      effectiveDate: '2026-11-10',
+      createdAt: new Date(),
+    };
+    const buyerRateDocId = 'b1_p1_2026-11-10';
+
+    // Succeeds with correct doc ID `b1_p1_2026-11-10`
+    await assertSucceeds(ownerDb.collection('buyerRates').doc(buyerRateDocId).set(validBuyerRate));
+    await assertSucceeds(ownerDb.collection('buyerRates').doc(buyerRateDocId).get());
+
+    // Overwriting same day succeeds
+    await assertSucceeds(ownerDb.collection('buyerRates').doc(buyerRateDocId).set({ ...validBuyerRate, rate: 155 }));
+
+    // Fails with mismatched doc ID
+    await assertFails(ownerDb.collection('buyerRates').doc('wrong_doc_id').set(validBuyerRate));
+
+    // Fails with negative rate
+    await assertFails(ownerDb.collection('buyerRates').doc(buyerRateDocId).set({ ...validBuyerRate, rate: -10 }));
+
+    // Supplier rate
+    const validSupplierRate = {
+      supplierId: 's1',
+      productId: 'p1',
+      rate: 140,
+      effectiveDate: '2026-11-10',
+      createdAt: new Date(),
+    };
+    const supplierRateDocId = 's1_p1_2026-11-10';
+
+    await assertSucceeds(ownerDb.collection('supplierRates').doc(supplierRateDocId).set(validSupplierRate));
+    await assertSucceeds(ownerDb.collection('supplierRates').doc(supplierRateDocId).get());
+    await assertFails(ownerDb.collection('supplierRates').doc('wrong_doc_id').set(validSupplierRate));
+
+    // Non-owner
+    const nonOwnerDb = testEnv.authenticatedContext('other-uid').firestore();
+    await assertFails(nonOwnerDb.collection('buyerRates').get());
+    await assertFails(nonOwnerDb.collection('buyerRates').doc(buyerRateDocId).set(validBuyerRate));
+    await assertFails(nonOwnerDb.collection('supplierRates').get());
+    await assertFails(nonOwnerDb.collection('supplierRates').doc(supplierRateDocId).set(validSupplierRate));
+  });
 });

@@ -17,12 +17,13 @@ Updated: 2026-11-10
 - T-13 Product barcode scanning & lookup (completed 2026-11-10)
 - T-14 Product tagging and filtering (completed 2026-11-10)
 - T-15 Archive products (completed 2026-11-10)
+- T-16 Buyer and supplier rates (completed 2026-11-10)
 
 ## Now
-- T-16 Buyer and supplier rates: ready to start
+- T-17 Retail price history: ready to start
 
 ## Blocked
 - none
 
 ## Notes for the next chat
-- T-15 completed with ProductRepository archiveProduct/unarchiveProduct, activeProductsProvider, archive warning dialog on ProductDetailScreen, and product archive unit/widget tests.
+- T-16 completed with BuyerRate & SupplierRate models, RatesRepository (same-day overwrite), RateFormSheet, integration on ProductDetailScreen, BuyerDetailScreen, and SupplierDetailScreen, security rules, and unit/widget tests.
