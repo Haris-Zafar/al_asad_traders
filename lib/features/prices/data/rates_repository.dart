@@ -1,19 +1,20 @@
 import 'package:al_asad_traders/core/errors/app_exception.dart';
 import 'package:al_asad_traders/core/strings.dart';
 import 'package:al_asad_traders/features/prices/models/buyer_rate.dart';
+import 'package:al_asad_traders/features/prices/models/retail_price.dart';
 import 'package:al_asad_traders/features/prices/models/supplier_rate.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Provider for [RatesRepository].
-/// Rule: docs/ARCHITECTURE.md > State pattern. Story: S5.
+/// Rule: docs/ARCHITECTURE.md > State pattern. Story: S5, S6.
 final Provider<RatesRepository> ratesRepositoryProvider =
     Provider<RatesRepository>((ref) {
       return RatesRepository(FirebaseFirestore.instance);
     });
 
-/// Repository handling buyer and supplier rate records in Firestore.
-/// Rule: docs/ARCHITECTURE.md > Layers. Story: S5.
+/// Repository handling buyer, supplier, and retail price records in Firestore.
+/// Rule: docs/ARCHITECTURE.md > Layers. Story: S5, S6.
 class RatesRepository {
   /// Creates a [RatesRepository] with the given [firestore] instance.
   RatesRepository(this._firestore);
@@ -25,6 +26,9 @@ class RatesRepository {
 
   CollectionReference<Map<String, dynamic>> get _supplierRatesRef =>
       _firestore.collection('supplierRates');
+
+  CollectionReference<Map<String, dynamic>> get _retailPricesRef =>
+      _firestore.collection('retailPrices');
 
   /// Saves or overwrites a buyer rate entry.
   /// Rule: docs/DATABASE.md > Collections (buyerRates). Story: S5.
@@ -53,6 +57,18 @@ class RatesRepository {
       );
       final rateWithId = rate.copyWith(id: docId);
       await _supplierRatesRef.doc(docId).set(rateWithId.toMap());
+    } catch (e) {
+      throw UnknownException(AppStrings.errorGeneric, e);
+    }
+  }
+
+  /// Saves or overwrites a retail price entry.
+  /// Rule: docs/DATABASE.md > Collections (retailPrices). Story: S6.
+  Future<void> saveRetailPrice(RetailPrice rate) async {
+    try {
+      final docId = RetailPrice.buildDocId(rate.productId, rate.effectiveDate);
+      final rateWithId = rate.copyWith(id: docId);
+      await _retailPricesRef.doc(docId).set(rateWithId.toMap());
     } catch (e) {
       throw UnknownException(AppStrings.errorGeneric, e);
     }
@@ -117,6 +133,21 @@ class RatesRepository {
         });
   }
 
+  /// Stream of retail prices for a specific product, sorted newest effective date first.
+  /// Rule: docs/DATABASE.md > Key queries. Story: S6.
+  Stream<List<RetailPrice>> watchRetailPricesForProduct(String productId) {
+    return _retailPricesRef
+        .where('productId', isEqualTo: productId)
+        .snapshots()
+        .map((snapshot) {
+          final list = snapshot.docs
+              .map((doc) => RetailPrice.fromDocument(doc))
+              .toList();
+          list.sort((a, b) => b.effectiveDate.compareTo(a.effectiveDate));
+          return list;
+        });
+  }
+
   /// Deletes a buyer rate by document ID.
   /// Rule: docs/DATABASE.md > Collections. Story: S5.
   Future<void> deleteBuyerRate(String id) async {
@@ -132,6 +163,16 @@ class RatesRepository {
   Future<void> deleteSupplierRate(String id) async {
     try {
       await _supplierRatesRef.doc(id).delete();
+    } catch (e) {
+      throw UnknownException(AppStrings.errorGeneric, e);
+    }
+  }
+
+  /// Deletes a retail price by document ID.
+  /// Rule: docs/DATABASE.md > Collections. Story: S6.
+  Future<void> deleteRetailPrice(String id) async {
+    try {
+      await _retailPricesRef.doc(id).delete();
     } catch (e) {
       throw UnknownException(AppStrings.errorGeneric, e);
     }

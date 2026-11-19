@@ -1,11 +1,12 @@
 import 'package:al_asad_traders/features/prices/data/rates_repository.dart';
 import 'package:al_asad_traders/features/prices/models/buyer_rate.dart';
+import 'package:al_asad_traders/features/prices/models/retail_price.dart';
 import 'package:al_asad_traders/features/prices/models/supplier_rate.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  group('RatesRepository (S5, T-16)', () {
+  group('RatesRepository (S5, S6, T-16, T-17)', () {
     late FakeFirebaseFirestore firestore;
     late RatesRepository repository;
 
@@ -128,39 +129,103 @@ void main() {
     );
 
     test(
-      'deleteBuyerRate and deleteSupplierRate removes rate documents',
+      'saveRetailPrice saves retail price with composite ID (T-17)',
       () async {
-        final buyerRate = BuyerRate(
+        final retailPrice = RetailPrice(
           id: '',
-          buyerId: 'b1',
           productId: 'p1',
-          rate: 150,
+          price: 160,
           effectiveDate: '2026-11-10',
-          createdAt: DateTime.now(),
+          createdAt: DateTime(2026, 11, 10, 10, 0),
         );
-        await repository.saveBuyerRate(buyerRate);
 
-        final supplierRate = SupplierRate(
-          id: '',
-          supplierId: 's1',
-          productId: 'p1',
-          rate: 140,
-          effectiveDate: '2026-11-10',
-          createdAt: DateTime.now(),
-        );
-        await repository.saveSupplierRate(supplierRate);
+        await repository.saveRetailPrice(retailPrice);
 
-        await repository.deleteBuyerRate('b1_p1_2026-11-10');
-        await repository.deleteSupplierRate('s1_p1_2026-11-10');
-
-        final buyerRates = await repository.watchBuyerRatesForBuyer('b1').first;
-        final supplierRates = await repository
-            .watchSupplierRatesForSupplier('s1')
+        final retailPrices = await repository
+            .watchRetailPricesForProduct('p1')
             .first;
-
-        expect(buyerRates, isEmpty);
-        expect(supplierRates, isEmpty);
+        expect(retailPrices.length, equals(1));
+        expect(retailPrices.first.id, equals('p1_2026-11-10'));
+        expect(retailPrices.first.price, equals(160));
+        expect(retailPrices.first.effectiveDate, equals('2026-11-10'));
       },
     );
+
+    test(
+      'saveRetailPrice same-day price overwrite replaces existing price (T-17)',
+      () async {
+        final price1 = RetailPrice(
+          id: '',
+          productId: 'p1',
+          price: 160,
+          effectiveDate: '2026-11-10',
+          createdAt: DateTime(2026, 11, 10, 10, 0),
+        );
+        await repository.saveRetailPrice(price1);
+
+        final price2 = RetailPrice(
+          id: '',
+          productId: 'p1',
+          price: 175,
+          effectiveDate: '2026-11-10',
+          createdAt: DateTime(2026, 11, 10, 15, 0),
+        );
+        await repository.saveRetailPrice(price2);
+
+        final retailPrices = await repository
+            .watchRetailPricesForProduct('p1')
+            .first;
+        expect(retailPrices.length, equals(1));
+        expect(retailPrices.first.id, equals('p1_2026-11-10'));
+        expect(retailPrices.first.price, equals(175));
+      },
+    );
+
+    test('deleteBuyerRate, deleteSupplierRate, and deleteRetailPrice removes documents', () async {
+      final buyerRate = BuyerRate(
+        id: '',
+        buyerId: 'b1',
+        productId: 'p1',
+        rate: 150,
+        effectiveDate: '2026-11-10',
+        createdAt: DateTime.now(),
+      );
+      await repository.saveBuyerRate(buyerRate);
+
+      final supplierRate = SupplierRate(
+        id: '',
+        supplierId: 's1',
+        productId: 'p1',
+        rate: 140,
+        effectiveDate: '2026-11-10',
+        createdAt: DateTime.now(),
+      );
+      await repository.saveSupplierRate(supplierRate);
+
+      final retailPrice = RetailPrice(
+        id: '',
+        productId: 'p1',
+        price: 160,
+        effectiveDate: '2026-11-10',
+        createdAt: DateTime.now(),
+      );
+      await repository.saveRetailPrice(retailPrice);
+
+      await repository.deleteBuyerRate('b1_p1_2026-11-10');
+      await repository.deleteSupplierRate('s1_p1_2026-11-10');
+      await repository.deleteRetailPrice('p1_2026-11-10');
+
+      final buyerRates = await repository.watchBuyerRatesForBuyer('b1').first;
+      final supplierRates = await repository
+          .watchSupplierRatesForSupplier('s1')
+          .first;
+      final retailPrices = await repository
+          .watchRetailPricesForProduct('p1')
+          .first;
+
+      expect(buyerRates, isEmpty);
+      expect(supplierRates, isEmpty);
+      expect(retailPrices, isEmpty);
+    });
   });
 }

@@ -18,12 +18,13 @@ Updated: 2026-11-10
 - T-14 Product tagging and filtering (completed 2026-11-10)
 - T-15 Archive products (completed 2026-11-10)
 - T-16 Buyer and supplier rates (completed 2026-11-10)
+- T-17 Retail price history (completed 2026-11-10)
 
 ## Now
-- T-17 Retail price history: ready to start
+- T-18 Price resolution rule: ready to start
 
 ## Blocked
 - none
 
 ## Notes for the next chat
-- T-16 completed with BuyerRate & SupplierRate models, RatesRepository (same-day overwrite), RateFormSheet, integration on ProductDetailScreen, BuyerDetailScreen, and SupplierDetailScreen, security rules, and unit/widget tests.
+- T-17 completed with RetailPrice model, RatesRepository extensions (same-day overwrite), RateFormSheet retail support, ProductDetailScreen integration, Firestore security rules, and unit/widget/rules tests.

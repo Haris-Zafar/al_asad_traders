@@ -11,7 +11,7 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../helpers/pump_app.dart';
 
 void main() {
-  group('RateFormSheet (S5, T-16)', () {
+  group('RateFormSheet (S5, S6, T-16, T-17)', () {
     late FakeFirebaseFirestore firestore;
     late RatesRepository repository;
     late ProviderContainer container;
@@ -77,6 +77,27 @@ void main() {
       expect(supplierRates.first.supplierId, equals('s1'));
       expect(supplierRates.first.productId, equals('p1'));
       expect(supplierRates.first.rate, equals(220));
+    });
+
+    testWidgets('renders RateFormSheet and saves retail price (T-17)', (
+      tester,
+    ) async {
+      await tester.pumpApp(
+        const RateFormSheet(productId: 'p1', initialRateType: RateType.retail),
+        container: container,
+      );
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byKey(const Key('rate_amount_field')), '180');
+      await tester.tap(find.byKey(const Key('save_rate_button')));
+      await tester.pumpAndSettle();
+
+      final retailPrices = await repository
+          .watchRetailPricesForProduct('p1')
+          .first;
+      expect(retailPrices.length, equals(1));
+      expect(retailPrices.first.productId, equals('p1'));
+      expect(retailPrices.first.price, equals(180));
     });
   });
 }

@@ -11,6 +11,7 @@ import 'package:al_asad_traders/features/people/providers/buyers_provider.dart';
 import 'package:al_asad_traders/features/people/providers/suppliers_provider.dart';
 import 'package:al_asad_traders/features/prices/data/rates_repository.dart';
 import 'package:al_asad_traders/features/prices/models/buyer_rate.dart';
+import 'package:al_asad_traders/features/prices/models/retail_price.dart';
 import 'package:al_asad_traders/features/prices/models/supplier_rate.dart';
 import 'package:al_asad_traders/features/products/models/product.dart';
 import 'package:al_asad_traders/features/products/providers/product_provider.dart';
@@ -18,10 +19,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-enum RateType { buyer, supplier }
+/// Enum representing the type of rate being added or edited.
+/// Rule: wholesale_project.md > Prices. Story: S5, S6.
+enum RateType { buyer, supplier, retail }
 
-/// Form sheet to add or edit a buyer/supplier rate entry.
-/// Rule: docs/UI_PLAN.md > Forms. Story: S5.
+/// Form sheet to add or edit a buyer, supplier, or retail rate entry.
+/// Rule: docs/UI_PLAN.md > Forms. Story: S5, S6.
 class RateFormSheet extends ConsumerStatefulWidget {
   /// Creates a [RateFormSheet].
   const RateFormSheet({
@@ -31,6 +34,8 @@ class RateFormSheet extends ConsumerStatefulWidget {
     this.productId,
     this.existingBuyerRate,
     this.existingSupplierRate,
+    this.existingRetailPrice,
+    this.initialRateType,
   });
 
   /// Pre-selected buyer ID, if opened from buyer context.
@@ -48,6 +53,12 @@ class RateFormSheet extends ConsumerStatefulWidget {
   /// Existing supplier rate to edit, if any.
   final SupplierRate? existingSupplierRate;
 
+  /// Existing retail price to edit, if any.
+  final RetailPrice? existingRetailPrice;
+
+  /// Initial rate type if specified.
+  final RateType? initialRateType;
+
   /// Shows the [RateFormSheet] modally.
   static Future<void> show(
     BuildContext context, {
@@ -56,6 +67,8 @@ class RateFormSheet extends ConsumerStatefulWidget {
     String? productId,
     BuyerRate? existingBuyerRate,
     SupplierRate? existingSupplierRate,
+    RetailPrice? existingRetailPrice,
+    RateType? initialRateType,
   }) {
     return showModalBottomSheet<void>(
       context: context,
@@ -66,6 +79,8 @@ class RateFormSheet extends ConsumerStatefulWidget {
         productId: productId,
         existingBuyerRate: existingBuyerRate,
         existingSupplierRate: existingSupplierRate,
+        existingRetailPrice: existingRetailPrice,
+        initialRateType: initialRateType,
       ),
     );
   }
@@ -92,6 +107,9 @@ class _RateFormSheetState extends ConsumerState<RateFormSheet> {
     } else if (widget.existingSupplierRate != null ||
         widget.supplierId != null) {
       _rateType = RateType.supplier;
+    } else if (widget.existingRetailPrice != null ||
+        widget.initialRateType == RateType.retail) {
+      _rateType = RateType.retail;
     } else {
       _rateType = RateType.buyer;
     }
@@ -102,17 +120,21 @@ class _RateFormSheetState extends ConsumerState<RateFormSheet> {
     _selectedProductId =
         widget.existingBuyerRate?.productId ??
         widget.existingSupplierRate?.productId ??
+        widget.existingRetailPrice?.productId ??
         widget.productId;
 
     final initialRateInt =
-        widget.existingBuyerRate?.rate ?? widget.existingSupplierRate?.rate;
+        widget.existingBuyerRate?.rate ??
+        widget.existingSupplierRate?.rate ??
+        widget.existingRetailPrice?.price;
     _rateController = TextEditingController(
       text: initialRateInt != null ? initialRateInt.toString() : '',
     );
 
     final initialDateStr =
         widget.existingBuyerRate?.effectiveDate ??
-        widget.existingSupplierRate?.effectiveDate;
+        widget.existingSupplierRate?.effectiveDate ??
+        widget.existingRetailPrice?.effectiveDate;
     if (initialDateStr != null && initialDateStr.isNotEmpty) {
       _effectiveDate = DateTime.tryParse(initialDateStr) ?? DateTime.now();
     } else {
@@ -260,7 +282,7 @@ class _RateFormSheetState extends ConsumerState<RateFormSheet> {
         );
 
         await repository.saveBuyerRate(rate);
-      } else {
+      } else if (_rateType == RateType.supplier) {
         if (_selectedSupplierId == null || _selectedSupplierId!.isEmpty) {
           setState(() {
             _errorText = AppStrings.selectSupplier;
@@ -284,6 +306,17 @@ class _RateFormSheetState extends ConsumerState<RateFormSheet> {
         );
 
         await repository.saveSupplierRate(rate);
+      } else {
+        final docId = RetailPrice.buildDocId(_selectedProductId!, dateStr);
+        final retailPrice = RetailPrice(
+          id: docId,
+          productId: _selectedProductId!,
+          price: rateInt,
+          effectiveDate: dateStr,
+          createdAt: widget.existingRetailPrice?.createdAt ?? DateTime.now(),
+        );
+
+        await repository.saveRetailPrice(retailPrice);
       }
 
       if (mounted) {
@@ -341,11 +374,11 @@ class _RateFormSheetState extends ConsumerState<RateFormSheet> {
         children: [
           if (!isFixedBuyer && !isFixedSupplier && isFixedProduct) ...[
             Text(AppStrings.rateTypeLabel),
-            Row(
-              children: [
-                Expanded(
-                  child: RadioListTile<RateType>(
-                    title: const Text(AppStrings.buyerRateType),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  Radio<RateType>(
                     value: RateType.buyer,
                     groupValue: _rateType,
                     onChanged: (val) {
@@ -356,10 +389,8 @@ class _RateFormSheetState extends ConsumerState<RateFormSheet> {
                       }
                     },
                   ),
-                ),
-                Expanded(
-                  child: RadioListTile<RateType>(
-                    title: const Text(AppStrings.supplierRateType),
+                  const Text(AppStrings.buyerRateType),
+                  Radio<RateType>(
                     value: RateType.supplier,
                     groupValue: _rateType,
                     onChanged: (val) {
@@ -370,8 +401,21 @@ class _RateFormSheetState extends ConsumerState<RateFormSheet> {
                       }
                     },
                   ),
-                ),
-              ],
+                  const Text(AppStrings.supplierRateType),
+                  Radio<RateType>(
+                    value: RateType.retail,
+                    groupValue: _rateType,
+                    onChanged: (val) {
+                      if (val != null) {
+                        setState(() {
+                          _rateType = val;
+                        });
+                      }
+                    },
+                  ),
+                  const Text(AppStrings.shopPrice),
+                ],
+              ),
             ),
             const SizedBox(height: AppSpacing.s),
           ],
@@ -399,7 +443,9 @@ class _RateFormSheetState extends ConsumerState<RateFormSheet> {
           const SizedBox(height: AppSpacing.m),
           AppNumberField(
             key: const Key('rate_amount_field'),
-            label: AppStrings.rateLabel,
+            label: _rateType == RateType.retail
+                ? AppStrings.shopPriceLabel
+                : AppStrings.rateLabel,
             controller: _rateController,
             errorText: _errorText,
           ),
